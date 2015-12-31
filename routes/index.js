@@ -6,8 +6,9 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Nail+ Project' });
 });
 
-router.get('/showData', function(req, res, next) {
-  res.render('showdata', { title: 'Show Data' });
+router.get('/', function(req, res, next) {
+	console.log(req.app);
+	res.render('showdata', { title: 'Show Data' });
 });
 
 

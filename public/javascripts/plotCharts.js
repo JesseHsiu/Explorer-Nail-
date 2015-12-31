@@ -48,7 +48,10 @@ var chart = c3.generate({
     },
     transition: {
 	  duration: 0
-	}
+	},
+    tooltip: {
+      show: false
+    }
 });
 
 
@@ -79,7 +82,10 @@ var sg1chart = c3.generate({
 	},
     transition: {
 	  duration: 0
-	}
+	},
+    tooltip: {
+      show: false
+    }
 });
 var sg2chart = c3.generate({
     bindto: '#sg2',
@@ -108,7 +114,10 @@ var sg2chart = c3.generate({
 	},
     transition: {
 	  duration: 0
-	}
+	},
+    tooltip: {
+      show: false
+    }
 });
 var sg3chart = c3.generate({
     bindto: '#sg3',
@@ -137,7 +146,10 @@ var sg3chart = c3.generate({
 	},
     transition: {
 	  duration: 0
-	}
+	},
+    tooltip: {
+      show: false
+    }
 });
 var sg4chart = c3.generate({
     bindto: '#sg4',
@@ -166,7 +178,10 @@ var sg4chart = c3.generate({
 	},
     transition: {
 	  duration: 0
-	}
+	},
+    tooltip: {
+      show: false
+    }
 });
 var sg5chart = c3.generate({
     bindto: '#sg5',
@@ -195,7 +210,10 @@ var sg5chart = c3.generate({
 	},
     transition: {
 	  duration: 0
-	}
+	},
+    tooltip: {
+      show: false
+    }
 });
 var sg6chart = c3.generate({
     bindto: '#sg6',
@@ -224,7 +242,10 @@ var sg6chart = c3.generate({
 	},
     transition: {
 	  duration: 0
-	}
+	},
+    tooltip: {
+      show: false
+    }
 });
 var sg7chart = c3.generate({
     bindto: '#sg7',
@@ -253,7 +274,10 @@ var sg7chart = c3.generate({
 	},
     transition: {
 	  duration: 0
-	}
+	},
+    tooltip: {
+      show: false
+    }
 });
 var sg8chart = c3.generate({
     bindto: '#sg8',
@@ -282,7 +306,10 @@ var sg8chart = c3.generate({
 	},
     transition: {
 	  duration: 0
-	}
+	},
+    tooltip: {
+      show: false
+    }
 });
 var sg9chart = c3.generate({
     bindto: '#sg9',
@@ -311,7 +338,10 @@ var sg9chart = c3.generate({
 	},
     transition: {
 	  duration: 0
-	}
+	},
+    tooltip: {
+      show: false
+    }
 });
 var chartsOfSG = [sg1chart,sg2chart,sg3chart,sg4chart,sg5chart,sg6chart,sg7chart,sg8chart,sg9chart];
 

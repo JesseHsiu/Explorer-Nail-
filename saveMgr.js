@@ -10,10 +10,9 @@ var saveMgr = {
 	init: function (filename)
 	{
 		this.filename = filename;
-		this.writableStream = fs.createWriteStream("./data/"+ filename +".csv");
+		this.writableStream = fs.createWriteStream("./public/data/"+ filename +".csv");
 		this.csvStream = csv.createWriteStream({headers: true});
 		this.csvStream.pipe(this.writableStream);
-		// 512app.locals.SGs.calibrationBase;
 	},
 	writeData: function (data) {
 		needToStoreData = data.split(" ");

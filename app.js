@@ -7,14 +7,18 @@ var bodyParser = require('body-parser');
 
 var routes = require('./routes/index');
 var records = require('./routes/records');
+var showdata = require('./routes/showdata');
 
 var app = express();
+
+
 
 // SGs
 app.locals.SGs = {
   calibrationBase : [512,512,512,512,512,512,512,512,512],//500,500,500,500,500,500,500,500,500
   currentValue : [512,512,512,512,512,512,512,512,512]
 } 
+
 
 // Serial
 var serialport = require("serialport");
@@ -26,15 +30,15 @@ var SerialPort = serialport.SerialPort; // localize object constructor
 // });
 
 
-// app.locals.sp = new SerialPort("/dev/cu.usbserial-AI02SSRK", {
-//   parser: serialport.parsers.readline("\n"),
-//   baudrate: 38400
-// });
+app.locals.sp = new SerialPort("/dev/cu.usbserial-AI02SSRK", {
+  parser: serialport.parsers.readline("\n"),
+  baudrate: 38400
+});
 
-// app.locals.sp.on("data", function (msg) {
-//   var receivedString = String(msg);
-//   handlerForNewData(receivedString);
-// })
+app.locals.sp.on("data", function (msg) {
+  var receivedString = String(msg);
+  handlerForNewData(receivedString);
+})
 
 var handlerForNewData = function(datas) {
   var storeDataToArray = datas.split(" ");
@@ -65,7 +69,25 @@ app.get('/SGValues', function(req, res){
   res.end('_SGValues(\'{"values": "'+ app.locals.SGs.currentValue + '"}\')');
 });
 
-app.use('/records',records);
+app.get('/reopenPort', function(req, res){
+  console.log("reopening");
+  res.writeHead(200, {'Content-Type': 'text/plain'});
+  res.end();
+  app.locals.sp.close(function (error) {
+    console.log("openNow");
+    app.locals.sp.open(function (error) {
+       if ( error ) {
+          console.log('failed to open: '+error);
+        } else {
+          console.log('open');
+        }
+    });
+  });
+
+});
+
+app.use('/records', records);
+app.use('/showdata', showdata);
 app.use('/', routes);
 
 

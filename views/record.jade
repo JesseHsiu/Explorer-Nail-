@@ -8,12 +8,13 @@ block content
 	.jumbotron
 		
 		h2 Record + Showlive
+
+		button.btn.btn-success(type='button', onclick='reopenPort()') Reopen Port
 		
-		.col-lg-12
-			.input-group
-				span.input-group-btn
-					button#recordBtn.btn.btn-default(type='button', onclick="recordBtnClick()") Start Record
-				input#filename.form-control(type='text', placeholder='filename')
+		.input-group
+			span.input-group-btn
+				button#recordBtn.btn.btn-default(type='button', onclick="recordBtnClick()") Start Record
+			input#filename.form-control(type='text', placeholder='filename')
 
 		br
 		br

@@ -2,8 +2,13 @@ var express = require('express');
 var router = express.Router();
 
 var saveMgr = require('./../saveMgr.js');
-var app = require('./../app.js');
 
+var stateMachine = {
+  IDLE: 0,
+  RECORDING: 1,
+};
+
+var state = stateMachine.IDLE;
 var instance = null;
 /* GET home page. */
 
@@ -17,22 +22,26 @@ router.get('/start/:filename', function(req, res, next) {
 
   console.log("get: " + req.params.filename);
   saveMgr.init(req.params.filename);
-  saveData("0 1 1 1 1 1 1 1 1 1 1");
- //  instance = app.locals.sp.on("data", function (msg) {
-	// handlerForNewData(msg);
- //  })
+  
+  state = stateMachine.RECORDING;
+  instance = req.app.locals.sp.on("data", function (msg) {
+	 if (state == stateMachine.RECORDING) {saveData(msg)};
+  });
 });
 
 router.get('/end', function(req, res, next) {
+  instance = null;
+  state = stateMachine.IDLE;
+
   res.writeHead(200, {'Content-Type': 'text/plain'});
   res.end();
   saveMgr.endOfWriting();
-  instance = null;
+  
 });
 
 var saveData = function(datas) {	
   var storeDataToArray = datas.split(" ");
-  console.log(storeDataToArray);
+  // console.log(storeDataToArray);
   if (storeDataToArray.length == 11)
   {
     saveMgr.writeData(datas);
