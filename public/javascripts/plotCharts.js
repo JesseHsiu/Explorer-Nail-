@@ -24,7 +24,8 @@ var chart = c3.generate({
             ['SG8', 0],
             ['SG9', 0]
         ],
-        type: 'bar'
+        type: 'bar',
+        labels: true
     },
     bar: {
         width: {
@@ -44,7 +45,10 @@ var chart = c3.generate({
         y: {
             lines: [{value:0}]
         }
-    }
+    },
+    transition: {
+	  duration: 0
+	}
 });
 
 
@@ -54,17 +58,27 @@ var sg1chart = c3.generate({
         columns: [
             ['SG1']
         ],
-        type: 'spline'
+        type: 'spline',
+        labels: true
     },
     axis: {
       y: {
         min: 0,
         max: 1024
-      }
+      },
+      x: {
+	    show: false
+	  }
     },
     size: {
-	  width: 250,
-	  height: 250
+	  width: 300,
+	  height: 200
+	},
+	interaction: {
+	  enabled: false
+	},
+    transition: {
+	  duration: 0
 	}
 });
 var sg2chart = c3.generate({
@@ -73,17 +87,27 @@ var sg2chart = c3.generate({
         columns: [
             ['SG2']
         ],
-        type: 'spline'
+        type: 'spline',
+        labels: true
     },
     axis: {
       y: {
         min: 0,
         max: 1024
-      }
+      },
+      x: {
+	    show: false
+	  }
     },
     size: {
-	  width: 250,
-	  height: 250
+	  width: 300,
+	  height: 200
+	},
+	interaction: {
+	  enabled: false
+	},
+    transition: {
+	  duration: 0
 	}
 });
 var sg3chart = c3.generate({
@@ -92,17 +116,27 @@ var sg3chart = c3.generate({
         columns: [
             ['SG3']
         ],
-        type: 'spline'
+        type: 'spline',
+        labels: true
     },
     axis: {
       y: {
         min: 0,
         max: 1024
-      }
+      },
+      x: {
+	    show: false
+	  }
     },
     size: {
-	  width: 250,
-	  height: 250
+	  width: 300,
+	  height: 200
+	},
+	interaction: {
+	  enabled: false
+	},
+    transition: {
+	  duration: 0
 	}
 });
 var sg4chart = c3.generate({
@@ -111,17 +145,27 @@ var sg4chart = c3.generate({
         columns: [
             ['SG4']
         ],
-        type: 'spline'
+        type: 'spline',
+        labels: true
     },
     axis: {
       y: {
         min: 0,
         max: 1024
-      }
+      },
+      x: {
+	    show: false
+	  }
     },
     size: {
-	  width: 250,
-	  height: 250
+	  width: 300,
+	  height: 200
+	},
+	interaction: {
+	  enabled: false
+	},
+    transition: {
+	  duration: 0
 	}
 });
 var sg5chart = c3.generate({
@@ -130,17 +174,27 @@ var sg5chart = c3.generate({
         columns: [
             ['SG5']
         ],
-        type: 'spline'
+        type: 'spline',
+        labels: true
     },
     axis: {
       y: {
         min: 0,
         max: 1024
-      }
+      },
+      x: {
+	    show: false
+	  }
     },
     size: {
-	  width: 250,
-	  height: 250
+	  width: 300,
+	  height: 200
+	},
+	interaction: {
+	  enabled: false
+	},
+    transition: {
+	  duration: 0
 	}
 });
 var sg6chart = c3.generate({
@@ -149,17 +203,27 @@ var sg6chart = c3.generate({
         columns: [
             ['SG6']
         ],
-        type: 'spline'
+        type: 'spline',
+        labels: true
     },
     axis: {
       y: {
         min: 0,
         max: 1024
-      }
+      },
+      x: {
+	    show: false
+	  }
     },
     size: {
-	  width: 250,
-	  height: 250
+	  width: 300,
+	  height: 200
+	},
+	interaction: {
+	  enabled: false
+	},
+    transition: {
+	  duration: 0
 	}
 });
 var sg7chart = c3.generate({
@@ -168,17 +232,27 @@ var sg7chart = c3.generate({
         columns: [
             ['SG7']
         ],
-        type: 'spline'
+        type: 'spline',
+        labels: true
     },
     axis: {
       y: {
         min: 0,
         max: 1024
-      }
+      },
+      x: {
+	    show: false
+	  }
     },
     size: {
-	  width: 250,
-	  height: 250
+	  width: 300,
+	  height: 200
+	},
+	interaction: {
+	  enabled: false
+	},
+    transition: {
+	  duration: 0
 	}
 });
 var sg8chart = c3.generate({
@@ -187,17 +261,27 @@ var sg8chart = c3.generate({
         columns: [
             ['SG8']
         ],
-        type: 'spline'
+        type: 'spline',
+        labels: true
     },
     axis: {
       y: {
         min: 0,
         max: 1024
-      }
+      },
+      x: {
+	    show: false
+	  }
     },
     size: {
-	  width: 250,
-	  height: 250
+	  width: 300,
+	  height: 200
+	},
+	interaction: {
+	  enabled: false
+	},
+    transition: {
+	  duration: 0
 	}
 });
 var sg9chart = c3.generate({
@@ -206,17 +290,27 @@ var sg9chart = c3.generate({
         columns: [
             ['SG9']
         ],
-        type: 'spline'
+        type: 'spline',
+        labels: true
     },
     axis: {
       y: {
         min: 0,
         max: 1024
-      }
+      },
+      x: {
+	    show: false
+	  }
     },
     size: {
-	  width: 250,
-	  height: 250
+	  width: 300,
+	  height: 200
+	},
+	interaction: {
+	  enabled: false
+	},
+    transition: {
+	  duration: 0
 	}
 });
 var chartsOfSG = [sg1chart,sg2chart,sg3chart,sg4chart,sg5chart,sg6chart,sg7chart,sg8chart,sg9chart];
@@ -236,10 +330,10 @@ window.setInterval(function(){
         obj = JSON.parse(data);
         var values = obj.values.split(",");
 
-        console.log((['SG1']).concat(SG_values[0]));
+        // console.log((['SG1']).concat(SG_values[0]));
         
         for (var i = 0; i < values.length; i++) {
-        	SG_values[i].push(values[0]);
+        	SG_values[i].push(values[i]);
         	SG_values[i].shift();
 
         	SG_values[i].unshift('SG' + String(i+1));
@@ -254,15 +348,15 @@ window.setInterval(function(){
 
         chart.load({
 		  columns: [
-		    ['SG1', SG_values[0][9]-500],
-            ['SG2', SG_values[1][9]-500],
-            ['SG3', SG_values[2][9]-500],
-            ['SG4', SG_values[3][9]-500],
-            ['SG5', SG_values[4][9]-500],
-            ['SG6', SG_values[5][9]-500],
-            ['SG7', SG_values[6][9]-500],
-            ['SG8', SG_values[7][9]-500],
-            ['SG9', SG_values[8][9]-500]
+		    ['SG1', SG_values[0][9]-512],
+            ['SG2', SG_values[1][9]-512],
+            ['SG3', SG_values[2][9]-512],
+            ['SG4', SG_values[3][9]-512],
+            ['SG5', SG_values[4][9]-512],
+            ['SG6', SG_values[5][9]-512],
+            ['SG7', SG_values[6][9]-512],
+            ['SG8', SG_values[7][9]-512],
+            ['SG9', SG_values[8][9]-512]
 		  ]
 		});
       },

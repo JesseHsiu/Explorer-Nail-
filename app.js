@@ -6,13 +6,14 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var routes = require('./routes/index');
+var records = require('./routes/records');
 
 var app = express();
 
 // SGs
 app.locals.SGs = {
-  calibrationBase : [500,500,500,500,500,500,500,500,500],//500,500,500,500,500,500,500,500,500
-  currentValue : [500,500,500,500,500,500,500,500,500]
+  calibrationBase : [512,512,512,512,512,512,512,512,512],//500,500,500,500,500,500,500,500,500
+  currentValue : [512,512,512,512,512,512,512,512,512]
 } 
 
 // Serial
@@ -25,21 +26,21 @@ var SerialPort = serialport.SerialPort; // localize object constructor
 // });
 
 
-var sp = new SerialPort("/dev/cu.usbserial-14CP0109", {
-  parser: serialport.parsers.readline("\n"),
-  baudrate: 38400
-});
+// app.locals.sp = new SerialPort("/dev/cu.usbserial-AI02SSRK", {
+//   parser: serialport.parsers.readline("\n"),
+//   baudrate: 38400
+// });
 
-sp.on("data", function (msg) {
-  var receivedString = String(msg);
-  handlerForNewData(receivedString);
-})
+// app.locals.sp.on("data", function (msg) {
+//   var receivedString = String(msg);
+//   handlerForNewData(receivedString);
+// })
 
 var handlerForNewData = function(datas) {
   var storeDataToArray = datas.split(" ");
   if (storeDataToArray.length == 11)
   {
-    console.log(datas);
+    // console.log(datas);
     for (var i = 1; i <= 9; i++) {
       app.locals.SGs.currentValue[i-1] = parseInt(storeDataToArray[i]);
     };
@@ -63,7 +64,12 @@ app.get('/SGValues', function(req, res){
   res.writeHead(200, {'Content-Type': 'text/plain'});
   res.end('_SGValues(\'{"values": "'+ app.locals.SGs.currentValue + '"}\')');
 });
+
+app.use('/records',records);
 app.use('/', routes);
+
+
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -6,12 +6,8 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Nail+ Project' });
 });
 
-router.get('/record', function(req, res, next) {
-  res.render('record', { title: 'record' });
-});
-
 router.get('/showData', function(req, res, next) {
-  res.render('showdata', { title: 'showdata' });
+  res.render('showdata', { title: 'Show Data' });
 });
 
 

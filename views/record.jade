@@ -8,21 +8,29 @@ block content
 	.jumbotron
 		
 		h2 Record + Showlive
+		
+		.col-lg-12
+			.input-group
+				span.input-group-btn
+					button#recordBtn.btn.btn-default(type='button', onclick="recordBtnClick()") Start Record
+				input#filename.form-control(type='text', placeholder='filename')
+
+		br
 		br
 		#chart
 		br
 		.row
 			.col-xs-6.col-sm-4
-				#sg1		
+				#sg1
 			.col-xs-6.col-sm-4
-				#sg2		
+				#sg2
 			.col-xs-6.col-sm-4
 				#sg3
 		.row
 			.col-xs-6.col-sm-4
-				#sg4		
+				#sg4
 			.col-xs-6.col-sm-4
-				#sg5		
+				#sg5
 			.col-xs-6.col-sm-4
 				#sg6
 		.row
@@ -34,4 +42,5 @@ block content
 				#sg9
 
 	script(src='./javascripts/plotCharts.js')
+	script(src='./javascripts/record_client.js')
 	
