@@ -346,7 +346,6 @@ var sg9chart = c3.generate({
 var chartsOfSG = [sg1chart,sg2chart,sg3chart,sg4chart,sg5chart,sg6chart,sg7chart,sg8chart,sg9chart];
 
 
-
 window.setInterval(function(){
 
   $.ajax({

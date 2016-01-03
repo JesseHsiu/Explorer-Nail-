@@ -8,9 +8,31 @@ var bodyParser = require('body-parser');
 var routes = require('./routes/index');
 var records = require('./routes/records');
 var showdata = require('./routes/showdata');
+var detectgesture = require('./routes/detectgesture');
 
 var app = express();
 
+
+
+
+
+
+var http = require('http');
+app.set('port', 3000);
+var server = http.createServer(app);
+var io = require('socket.io')(server);
+
+var globalsocket = null;
+
+server.listen(3000);
+
+io.on('connection', function (socket) {
+  socket.emit('identification',{});
+  socket.on('identification', function (data) {
+    if (data['device']== 'desktop') {globalsocket = socket};
+  });
+
+});
 
 
 // SGs
@@ -48,7 +70,12 @@ var handlerForNewData = function(datas) {
     for (var i = 1; i <= 9; i++) {
       app.locals.SGs.currentValue[i-1] = parseInt(storeDataToArray[i]);
     };
-  };  
+  };
+  if (globalsocket !=null) {
+    globalsocket.broadcast.emit('SGdata', { data: app.locals.SGs.currentValue});
+    globalsocket.emit('SGdata', { data: app.locals.SGs.currentValue});
+  };
+  
 };
 
 // view engine setup
@@ -88,6 +115,7 @@ app.get('/reopenPort', function(req, res){
 
 app.use('/records', records);
 app.use('/showdata', showdata);
+app.use('/detectgesture', detectgesture);
 app.use('/', routes);
 
 
