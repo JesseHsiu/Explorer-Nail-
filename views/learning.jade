@@ -1,0 +1,26 @@
+extends layout
+
+block content
+	.jumbotron
+		h2 Learning
+		br
+		button#recordBtn.btn.btn-default(type='button', onclick="recordBtnClick()") Start Record
+		button#clearBtn.btn.btn-default(type='button', onclick="cleanBtnClick()") Clean All Data
+		br
+		h4 Select Type Of Input
+		br
+		input(type='radio', name='type', value='left')
+		|	Left  
+		input(type='radio', name='type', value='right')
+		|	Right  
+		input(type='radio', name='type', value='up')
+		|	Up  
+		input(type='radio', name='type', value='down')
+		|	Down  
+		input(type='radio', name='type', value='check')
+		|	Check  
+		br
+		br
+		h4 Status
+			#graph
+		script(src='./javascripts/learning_client.js')

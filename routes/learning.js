@@ -1,27 +1,24 @@
 var express = require('express');
 var router = express.Router();
+var shell = require('shelljs');
 
 var saveMgr = require('./../saveMgr.js');
-
 var stateMachine = {
   IDLE: 0,
   RECORDING: 1,
 };
 
 var state = stateMachine.IDLE;
-var instance = null;
-/* GET home page. */
 
 router.get('/', function(req, res, next) {
-  res.render('record', { title: 'Record' });
+	res.render('learning', { title: 'Learning' });
 });
 
 router.get('/start/:filename', function(req, res, next) {
   res.writeHead(200, {'Content-Type': 'text/plain'});
   res.end();
-
-  console.log("get: " + req.params.filename);
-  saveMgr.init('/public/data/' , req.params.filename, true);
+  console.log(req.params.filename);
+  saveMgr.init('/data/training/',req.params.filename, false);
   
   state = stateMachine.RECORDING;
   instance = req.app.locals.sp.on("data", function (msg) {
@@ -38,13 +35,22 @@ router.get('/end', function(req, res, next) {
   saveMgr.endOfWriting();
 });
 
+router.get('/cleardata', function(req, res, next) {
+  state = stateMachine.IDLE;
+
+  shell.rm('./data/training/*');
+
+  res.writeHead(200, {'Content-Type': 'text/plain'});
+  res.end();
+});
+
 var saveData = function(datas) {	
   var storeDataToArray = datas.split(" ");
-  // console.log(storeDataToArray);
   if (storeDataToArray.length == 11)
   {
     saveMgr.writeData(datas);
   };  
 };
+
 
 module.exports = router;

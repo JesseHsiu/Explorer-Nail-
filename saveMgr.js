@@ -7,11 +7,11 @@ var saveMgr = {
 	filename : null,
 	writableStream : null,
 	SGsBase : null,
-	init: function (filename)
+	init: function (folder, filename, needHeader)
 	{
 		this.filename = filename;
-		this.writableStream = fs.createWriteStream("./public/data/"+ filename +".csv");
-		this.csvStream = csv.createWriteStream({headers: true});
+		this.writableStream = fs.createWriteStream("."+ folder + filename +".csv");
+		this.csvStream = csv.createWriteStream({'headers': needHeader, 'flags': 'a'});
 		this.csvStream.pipe(this.writableStream);
 	},
 	writeData: function (data) {

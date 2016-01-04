@@ -23,8 +23,8 @@ socket.on('identification', function (data) {
 });
 
 // var state = 'Idle';
-var collect_datalength = 50;
-var activate_datalength = 25;
+var collect_datalength = 60;
+var activate_datalength = 30;
 
 
 var recount = 0;
@@ -62,7 +62,7 @@ socket.on('SGdata', function (data) {
         var frontavg = getAvg(front);
         var endavg = getAvg(end);
 
-        if (endavg/frontavg < 1.01 && endavg/frontavg > 0.99) {endDetect = true;}
+        if (endavg/frontavg < 1.05 && endavg/frontavg > 0.95) {endDetect = true;}
         
       }
     };
