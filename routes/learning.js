@@ -22,13 +22,16 @@ router.get('/start/:filename', function(req, res, next) {
   saveMgr.init('/data/training/',req.params.filename, false);
   
   state = stateMachine.RECORDING;
-  instance = req.app.locals.sp.on("data", function (msg) {
-	 if (state == stateMachine.RECORDING) {saveData(msg)};
-  });
+  req.app.locals.sp.on("data", recording);
 });
 
+function recording (msg) {
+  if (state == stateMachine.RECORDING) {saveData(msg)};
+}
+
 router.get('/end', function(req, res, next) {
-  instance = null;
+  // instance = null;
+  req.app.locals.sp.removeListener("data", recording);
   state = stateMachine.IDLE;
 
   res.writeHead(200, {'Content-Type': 'text/plain'});
