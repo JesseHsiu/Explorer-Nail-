@@ -21,7 +21,7 @@ var trainMgr = {
 
 		for (var i = 0; i < this.data.length; i++) {
 			var step = this.data[i]['data'].length/300.0;
-			console.log(step);
+			// console.log(step);
 			var currentStep = 0.0;
 			var normalizedData = [];
 			
@@ -35,9 +35,14 @@ var trainMgr = {
 		};
 		this.norm_data = finalOutput;
 		var configJSON = JSON.stringify(finalOutput);
-		fs.writeFileSync("."+ this.folder + "data_normalized.json", configJSON);
+		var self = this;
+		fs.writeFile("."+ this.folder + "data_normalized.json", configJSON,function () {
+			self.train();	
+		});
+		
+		// });
 
-		this.train();
+		
 	},
 	train: function () {
 
@@ -67,26 +72,27 @@ var trainMgr = {
 			};
 		};
 
-		var clf = new svm.CSVC();
-
-		for (var i = 0; i < trainingSet.length; i++) {
-			
-			clf.train(trainingSet[i])
-				.progress(function(progress){
-					console.log('training progress: %d%', Math.round(progress*100));
-				})
-				.spread(function (model, report) {
-					console.log('training report: %s\nPredictions:', so(report));
-					trainingSet[i].forEach(function(ex){
-					var prediction = clf.predictSync(ex[0]);
-					console.log('%d', prediction);
-					});
-				});
-			
-
+		
+		this.trainOneByOne(trainingSet, 0);
+	},
+	trainOneByOne: function (trainingSet, index) {
+		if (index > trainingSet.length) {
+			console.log('Done Training');
+			return
 		};
 
-
+		var self = this;
+		var clf = new svm.CSVC();
+		clf.train(trainingSet[index])
+			.progress(function(progress){
+				console.log(' %d - training progress: %d%', index ,Math.round(progress*100));
+			})
+			.spread(function (model, report) {
+				console.log();
+				fs.writeFileSync("."+ self.folder+ "model"+ index.toString() +".json" ,JSON.stringify(model))
+				console.log('training report: %s', so(report['accuracy']));
+				self.trainOneByOne(trainingSet, index+1);
+			});
 	},
 	transferNameToId:function (type) {
 		if (type == "left")

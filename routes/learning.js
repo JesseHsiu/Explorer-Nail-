@@ -49,12 +49,13 @@ router.get('/cleardata', function(req, res, next) {
 });
 
 router.get('/trainCurrentData', function(req, res, next) {
+  res.writeHead(200, {'Content-Type': 'text/plain'});
+  res.end();
   
   trainMgr.init('/data/training/');
   trainMgr.equalLength();
   
-  res.writeHead(200, {'Content-Type': 'text/plain'});
-  res.end();
+  
 });
 
 var saveData = function(datas) {	

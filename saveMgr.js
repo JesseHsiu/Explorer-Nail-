@@ -22,7 +22,7 @@ var saveMgr = {
 
 		var datas = [];
 
-		for (var i = 0; i < needToStoreData.length; i++) {
+		for (var i = 1; i < needToStoreData.length-1; i++) {
 			datas.push(needToStoreData[i] - 512);
 		};
 		this.dataToStore.push(datas);
