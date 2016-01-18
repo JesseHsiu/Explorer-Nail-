@@ -94,3 +94,11 @@ function getAvg (array) {
   return total / array.length;
 }
 
+function predictNow () {
+  $.ajax({
+        url: 'http://127.0.0.1:3000/detectgesture/predict',
+        cache: false,
+        timeout: 5000
+    });
+}
+

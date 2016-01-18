@@ -39,10 +39,6 @@ var trainMgr = {
 		fs.writeFile("."+ this.folder + "data_normalized.json", configJSON,function () {
 			self.train();	
 		});
-		
-		// });
-
-		
 	},
 	train: function () {
 
@@ -71,8 +67,6 @@ var trainMgr = {
 				trainingSet[j].push([eachdataForSGs[j] ,this.transferNameToId(this.norm_data[i]['type'])]);
 			};
 		};
-
-		
 		this.trainOneByOne(trainingSet, 0);
 	},
 	trainOneByOne: function (trainingSet, index) {
@@ -89,7 +83,8 @@ var trainMgr = {
 			})
 			.spread(function (model, report) {
 				console.log();
-				fs.writeFileSync("."+ self.folder+ "model"+ index.toString() +".json" ,JSON.stringify(model))
+				fs.writeFileSync("./data/models/model"+ index.toString() +".json" ,JSON.stringify(model))
+				fs.appendFile('./data/models/accuracy.txt', report['accuracy'] + '\n');
 				console.log('training report: %s', so(report['accuracy']));
 				self.trainOneByOne(trainingSet, index+1);
 			});

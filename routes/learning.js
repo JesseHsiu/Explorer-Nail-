@@ -44,6 +44,7 @@ router.get('/cleardata', function(req, res, next) {
   state = stateMachine.IDLE;
 
   shell.rm('./data/training/*');
+  shell.rm('./data/models/*');
   res.writeHead(200, {'Content-Type': 'text/plain'});
   res.end();
 });
