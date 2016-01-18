@@ -13,11 +13,6 @@ var learning = require('./routes/learning');
 
 var app = express();
 
-
-
-
-
-
 var http = require('http');
 app.set('port', 3000);
 var server = http.createServer(app);
@@ -53,15 +48,15 @@ var SerialPort = serialport.SerialPort; // localize object constructor
 // });
 
 
-// app.locals.sp = new SerialPort("/dev/cu.usbserial-AI02SSRK", {
-//   parser: serialport.parsers.readline("\n"),
-//   baudrate: 38400
-// });
+app.locals.sp = new SerialPort("/dev/cu.usbserial-AI02SSRK", {
+  parser: serialport.parsers.readline("\n"),
+  baudrate: 38400
+});
 
-// app.locals.sp.on("data", function (msg) {
-//   var receivedString = String(msg);
-//   handlerForNewData(receivedString);
-// })
+app.locals.sp.on("data", function (msg) {
+  var receivedString = String(msg);
+  handlerForNewData(receivedString);
+})
 
 var handlerForNewData = function(datas) {
   var storeDataToArray = datas.split(" ");

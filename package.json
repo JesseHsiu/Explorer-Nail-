@@ -13,6 +13,7 @@
     "fast-csv": "^0.6.0",
     "jade": "~1.9.2",
     "morgan": "~1.5.1",
+    "node-svm": "^2.1.7",
     "serialport": "^2.0.5",
     "serve-favicon": "~2.2.0",
     "shelljs": "^0.5.3",

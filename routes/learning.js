@@ -3,6 +3,7 @@ var router = express.Router();
 var shell = require('shelljs');
 
 var saveMgr = require('./../saveMgr.js');
+var trainMgr = require('./../trainMgr.js');
 var stateMachine = {
   IDLE: 0,
   RECORDING: 1,
@@ -32,6 +33,7 @@ router.get('/end', function(req, res, next) {
 
   res.writeHead(200, {'Content-Type': 'text/plain'});
   res.end();
+  saveMgr.writeEnd();
   saveMgr.endOfWriting();
 });
 
@@ -39,7 +41,15 @@ router.get('/cleardata', function(req, res, next) {
   state = stateMachine.IDLE;
 
   shell.rm('./data/training/*');
+  res.writeHead(200, {'Content-Type': 'text/plain'});
+  res.end();
+});
 
+router.get('/trainCurrentData', function(req, res, next) {
+  
+  trainMgr.init('/data/training/');
+  trainMgr.equalLength();
+  
   res.writeHead(200, {'Content-Type': 'text/plain'});
   res.end();
 });

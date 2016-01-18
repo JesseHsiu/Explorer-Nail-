@@ -41,3 +41,13 @@ function cleanBtnClick () {
 	$("#recordBtn").removeClass("btn-danger");
 	$("#recordBtn").text("Start Record");
 }
+
+
+function trainByTheData () {
+	$.ajax({
+        url: 'http://127.0.0.1:3000/learning/trainCurrentData',
+        cache: false,
+        timeout: 5000
+    });
+    state = record_state.IDLE;
+}
