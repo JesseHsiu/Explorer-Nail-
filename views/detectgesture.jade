@@ -2,7 +2,9 @@ extends layout
 
 block content
 	.jumbotron
-		button#predictBtn.btn.btn-primary(type='button', onclick="predictNow()") Predict
+		button#predictBtn.btn.btn-primary(type='button', onclick="predictNow()") Predict Init
+		button#predictBtn.btn.btn-success(type='button', onclick="startCollect()") Start
+		button#predictBtn.btn.btn-danger(type='button', onclick="endCollet()") End
 		h2 Detect gesture
 			h3#value
 			h3#state

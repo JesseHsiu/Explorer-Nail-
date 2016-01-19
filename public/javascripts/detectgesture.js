@@ -99,6 +99,24 @@ function predictNow () {
         url: 'http://127.0.0.1:3000/detectgesture/predict',
         cache: false,
         timeout: 5000
-    });
+  });
+}
+
+function startCollect()
+{
+  $.ajax({
+        url: 'http://127.0.0.1:3000/detectgesture/start',
+        cache: false,
+        timeout: 5000
+  });
+}
+
+function endCollet()
+{
+  $.ajax({
+        url: 'http://127.0.0.1:3000/detectgesture/end',
+        cache: false,
+        timeout: 5000
+  });
 }
 
