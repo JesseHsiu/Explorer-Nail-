@@ -9,19 +9,20 @@ var predictMgr = {
 	validatedModel : new Array(9),
 	dataPort : null,
 	dataToPredict : null,
-	init: function (dataPort)
-	{
-		this.dataPort = dataPort;
-		var self = this;
-		glob("./data/models/*.json", function (er, files) {
-			for (var i = 0; i < files.length; i++) {
+	tmpForDifferenct : null,
+	init: function ()
+	{//dataPort
+		// this.dataPort = dataPort;
+		this.dataToPredict = [];
 
-				fs.readFile(files[i], function (err, data) {
-					self.predicter[i] = svm.restore(JSON.parse(data));
-					// self.predicter[i].evaluate;
-				})
-			};
-		});
+		var files = glob.sync("./data/models/*.json");
+
+		for (var i = 0; i < files.length; i++) {
+			var data = fs.readFileSync(files[i]);
+			this.predicter[i] = svm.restore(JSON.parse(data));
+			// console.log(this.predicter[i]);
+		};
+
 		var accuracies = fs.readFileSync('./data/models/accuracy.txt').toString().split("\n");
 		
 		for (var i = 0; i < accuracies.length-1; i++) {
@@ -38,13 +39,20 @@ var predictMgr = {
 
 	},
 	predict: function () {
-		var norm_data = this.normalizeData();
-		var array = this.dataByOneSG(norm_data);
+		// var norm_data = this.normalizeData();
+		// var array = this.dataByOneSG(norm_data);
+		
+		var tmpTest = [];
 
-		for (var i = 0; i < array.length; i++) {
-			var prediction = this.predicter[i].predictSync(array[i]);
-			console.log(this.transferIdToName(prediction));
+		for (var i = 0; i < 300; i++) {
+			tmpTest.push(128);
+		}
+		// console.log(tmpTest);
+		for (var i = 0; i < 9; i++) {//Probabilities
+			var prediction = this.predicter[i].predictSync(tmpTest);
+			console.log(prediction);
 		};
+		this.dataToPredict = [];
 
 	},
 	dataByOneSG : function (norm_data) {
@@ -65,28 +73,37 @@ var predictMgr = {
 		
 	},
 	normalizeData: function () {
-		var step = this.dataToPredict.length/300.0;
 		
+		var step = this.dataToPredict.length/300.0;
 		var currentStep = 0.0;
 		var normalizedData = [];
 		
 		for (var j = 0; j < 300; j++) {
-			normalizedData.push(this.dataToPredict[i][Math.floor(currentStep)]);
+			normalizedData.push(this.dataToPredict[Math.floor(currentStep)]);
 			currentStep += step;
 		};
 
 		return normalizedData;
-		
 	},
 	storeNeedToPredictData: function (data) {
 		needToStoreData = data.split(" ");
 
-		var datas = [];
+		var base = [];
 
 		for (var i = 1; i < needToStoreData.length-1; i++) {
-			datas.push(needToStoreData[i] - 512);
+			base.push(needToStoreData[i]);
 		};
-		this.dataToPredict.push(datas);
+
+		if (tmpForDifferenct != null)
+		{
+			var datas = [];
+			for (var i = 1; i < needToStoreData.length-1; i++) {
+				datas.push(needToStoreData[i] - this.tmpForDifferenct[i]);
+			};
+			this.dataToStore.push(datas);
+		};
+
+		this.tmpForDifferenct = base;
 	},
 	collectDataOnPort: function () {
 		this.dataPort.on('data',this.storeNeedToPredictData);
