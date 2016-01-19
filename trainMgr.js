@@ -76,7 +76,9 @@ var trainMgr = {
 		};
 
 		var self = this;
-		var clf = new svm.CSVC();
+		var clf = new svm.CSVC({
+			 probability : true
+		});
 		clf.train(trainingSet[index])
 			.progress(function(progress){
 				console.log(' %d - training progress: %d%', index ,Math.round(progress*100));
