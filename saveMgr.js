@@ -9,7 +9,7 @@ var saveMgr = {
 	SGsBase : null,
 	filePath : null,
 	dataToStore : [],
-	tmpForDifferenct : null,
+	tmpForDifferenct : [],
 	init: function (folder, filename, needHeader)
 	{
 		this.filePath = "."+ folder + "data.json";
@@ -21,22 +21,28 @@ var saveMgr = {
 	writeData: function (data) {
 		needToStoreData = data.split(" ");
 
-		var base = [];
+		
+		// console.log(base);
 
-		for (var i = 1; i < needToStoreData.length-1; i++) {
-			base.push(needToStoreData[i]);
-		};
+		// this.dataToStore.push(base);
+		// console.log(base);
 
-		if (tmpForDifferenct != null)
+		if (this.tmpForDifferenct.length != 0)
 		{
 			var datas = [];
 			for (var i = 1; i < needToStoreData.length-1; i++) {
-				datas.push(needToStoreData[i] - this.tmpForDifferenct[i]);
+				datas.push(needToStoreData[i] - this.tmpForDifferenct[i-1]);
 			};
 			this.dataToStore.push(datas);
-		};
+		}
+		else{
+			var datas = [];
+			for (var i = 1; i < needToStoreData.length-1; i++) {
+				this.tmpForDifferenct.push(needToStoreData[i]);
+			};
+		}
 
-		this.tmpForDifferenct = base;
+		
 		
 		
 		// this.csvStream.write({sg0: needToStoreData[1] - 512, sg2: needToStoreData[2] - 512, sg3: needToStoreData[3] - 512, sg4: needToStoreData[4] - 512, sg5: needToStoreData[5] - 512, sg6: needToStoreData[6] - 512, sg7: needToStoreData[7] - 512, sg8: needToStoreData[8] - 512, sg9: needToStoreData[9] - 512});
@@ -64,6 +70,7 @@ var saveMgr = {
 			var configJSON = JSON.stringify(array);
 			fs.writeFileSync(this.filePath, configJSON);
 		}
+		this.tmpForDifferenct = [];
 	}
 }
 

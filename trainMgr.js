@@ -76,8 +76,14 @@ var trainMgr = {
 		};
 
 		var self = this;
-		var clf = new svm.CSVC({
-			 probability : true
+		var clf = new svm.SVM({
+			
+			svmType: 'C_SVC',
+		    c: [2], 
+		    // kernels parameters 
+		    kernelType: 'RBF',
+		    gamma: [0.0078125],
+
 		});
 		clf.train(trainingSet[index])
 			.progress(function(progress){

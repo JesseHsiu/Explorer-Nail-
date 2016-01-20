@@ -4,7 +4,7 @@ var predictMgr = require('./../predictMgr.js');
 
 
 router.get('/', function(req, res, next) {
-	predictMgr.init();//req.app.locals.sp
+	predictMgr.init(req.app.locals.sp);//req.app.locals.sp
 	res.render('detectgesture', { title: 'Detect Gesture' });
 });
 
@@ -24,7 +24,7 @@ router.get('/end', function(req, res, next) {
   res.writeHead(200, {'Content-Type': 'text/plain'});
   res.end();
 
-  // req.app.locals.sp.removeListener("data", recording);
+  req.app.locals.sp.removeListener("data", recording);
   predictMgr.predict();
 
 });

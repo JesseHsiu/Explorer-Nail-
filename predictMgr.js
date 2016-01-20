@@ -9,10 +9,10 @@ var predictMgr = {
 	validatedModel : new Array(9),
 	dataPort : null,
 	dataToPredict : null,
-	tmpForDifferenct : null,
-	init: function ()
+	tmpForDifferenct : [],
+	init: function (dataPort)
 	{//dataPort
-		// this.dataPort = dataPort;
+		this.dataPort = dataPort;
 		this.dataToPredict = [];
 
 		var files = glob.sync("./data/models/*.json");
@@ -23,36 +23,51 @@ var predictMgr = {
 			// console.log(this.predicter[i]);
 		};
 
+
+		// var tmp = [];
+
+		// for (var i = 0; i < 300; i++) {
+		// 	tmp.push(0.5185546875);
+		// };
+
+		// console.log(this.predicter[1].predictSync(tmp));
+
 		var accuracies = fs.readFileSync('./data/models/accuracy.txt').toString().split("\n");
 		
 		for (var i = 0; i < accuracies.length-1; i++) {
-			if (parseFloat(accuracies[i]) > 0.8)
-			{
-				console.log('good');
-				validatedModel = true;
-			}
-			else{
-				console.log('bad');
-				validatedModel = false;
-			}
+			this.validatedModel[i] = accuracies[i];
+			// if (parseFloat(accuracies[i]) > 0.8)
+			// {
+			// 	console.log('good');
+				
+			// }
+			// else{
+			// 	console.log('bad');
+			// 	this.validatedModel[i] = false;
+			// }
 		};
 
 	},
 	predict: function () {
-		// var norm_data = this.normalizeData();
-		// var array = this.dataByOneSG(norm_data);
 		
-		var tmpTest = [];
-
-		for (var i = 0; i < 300; i++) {
-			tmpTest.push(128);
-		}
-		// console.log(tmpTest);
+		var norm_data = this.normalizeData();
+		var array = this.dataByOneSG(norm_data);
+		
 		for (var i = 0; i < 9; i++) {//Probabilities
-			var prediction = this.predicter[i].predictSync(tmpTest);
-			console.log(prediction);
+			var predictionLabel = this.predicter[i].predictSync(array[i]);
+			var prediction = this.predicter[i].predictProbabilitiesSync(array[i]);
+			
+			if (this.validatedModel[i] > 0.8)
+			{
+				console.log(predictionLabel + " -> " + so(prediction));
+			}
+			else
+			{
+				console.log("not validated");
+			}
 		};
 		this.dataToPredict = [];
+		this.tmpForDifferenct = [];
 
 	},
 	dataByOneSG : function (norm_data) {
@@ -68,6 +83,7 @@ var predictMgr = {
 				array[i].push(norm_data[j][i]);
 			};
 		};
+		// console.log(array[1]);
 
 		return array;
 		
@@ -86,24 +102,38 @@ var predictMgr = {
 		return normalizedData;
 	},
 	storeNeedToPredictData: function (data) {
+		// console.log(base);
+
+		// this.dataToStore.push(base);
+		// console.log(base);
 		needToStoreData = data.split(" ");
-
-		var base = [];
-
-		for (var i = 1; i < needToStoreData.length-1; i++) {
-			base.push(needToStoreData[i]);
-		};
-
-		if (tmpForDifferenct != null)
+		if (this.tmpForDifferenct.length != 0)
 		{
 			var datas = [];
 			for (var i = 1; i < needToStoreData.length-1; i++) {
-				datas.push(needToStoreData[i] - this.tmpForDifferenct[i]);
+				datas.push(needToStoreData[i] - this.tmpForDifferenct[i-1]);
 			};
-			this.dataToStore.push(datas);
-		};
+			console.log(datas);
+			this.dataToPredict.push(datas);
+		}
+		else{
+			var datas = [];
+			for (var i = 1; i < needToStoreData.length-1; i++) {
+				this.tmpForDifferenct.push(needToStoreData[i]);
+			};
+		}
 
-		this.tmpForDifferenct = base;
+
+		// if (this.tmpForDifferenct != null)
+		// {
+		// 	var datas = [];
+		// 	for (var i = 1; i < needToStoreData.length-1; i++) {
+		// 		datas.push(needToStoreData[i] - this.tmpForDifferenct[i-1]);
+		// 	};
+		// 	this.dataToPredict.push(datas);
+		// };
+
+		// this.tmpForDifferenct = base;
 	},
 	collectDataOnPort: function () {
 		this.dataPort.on('data',this.storeNeedToPredictData);
