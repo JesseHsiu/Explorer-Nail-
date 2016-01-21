@@ -54,7 +54,7 @@ router.get('/trainCurrentData', function(req, res, next) {
   res.end();
   
   trainMgr.init('/data/training/');
-  trainMgr.equalLength();
+  trainMgr.train();
   
   
 });

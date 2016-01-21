@@ -9,6 +9,7 @@ var trainMgr = {
 	folder : null,
 	data: null,
 	norm_data : null,
+	dataLength : 50.0,
 	init: function (folder)
 	{
 		this.folder = folder;
@@ -16,16 +17,53 @@ var trainMgr = {
 		var file = fs.readFileSync(this.filePath);
 		this.data = JSON.parse(file);
 	},
+
+	train: function(){
+		var processedData = this.processDataByTime();
+		this.trainSVM(processedData);
+	},
+	processDataByTime: function (){
+		var sg_count = this.data[0]['data'][0].length;
+		var trainingSetWithLable = [];
+
+		for (var i = 0; i < this.data.length; i++) {
+			var lengthOfRawData = this.data[i]['data'].length;
+			var trainingSet = new Array(18);
+
+			for (var j = 0; j < trainingSet.length; j++) {
+				trainingSet[j] = 0;
+			};
+
+			for (var j = 0; j < sg_count; j++) {
+				var middle = Math.floor(lengthOfRawData / 2);
+				for (var k = 0; k < this.data[i]['data'].length; k++) {
+					
+
+					if (this.data[i]['data'][k][j] >= 0)
+					{
+						trainingSet[j*2] += Math.abs(this.data[i]['data'][k][j]) * Math.abs(middle - k) / middle;
+					}
+					else{
+						trainingSet[j*2 + 1] += Math.abs(this.data[i]['data'][k][j]) * Math.abs(middle - k) /middle;;
+					}
+				};	
+			};
+			console.log([ trainingSet ,this.transferNameToId(this.data[i]['type'])]);
+			trainingSetWithLable.push([ trainingSet ,this.transferNameToId(this.data[i]['type'])])
+		}
+
+		return trainingSetWithLable;
+	},
 	equalLength: function () {
 		var finalOutput = [];
 
 		for (var i = 0; i < this.data.length; i++) {
-			var step = this.data[i]['data'].length/300.0;
+			var step = this.data[i]['data'].length/this.dataLength;
 			// console.log(step);
 			var currentStep = 0.0;
 			var normalizedData = [];
 			
-			for (var j = 0; j < 300; j++) {
+			for (var j = 0; j < Math.floor(this.dataLength); j++) {
 				normalizedData.push(this.data[i]['data'][Math.floor(currentStep)]);
 				currentStep += step;
 			};
@@ -35,39 +73,97 @@ var trainMgr = {
 		};
 		this.norm_data = finalOutput;
 		var configJSON = JSON.stringify(finalOutput);
-		var self = this;
-		fs.writeFile("."+ this.folder + "data_normalized.json", configJSON,function () {
-			self.train();	
-		});
+		fs.writeFileSync("."+ this.folder + "data_normalized.json");
+		// this.processData();
 	},
-	train: function () {
+	processData: function () {
 
 		var sg_count = this.norm_data[0]['data'][0].length;
 
-		var trainingSet = new Array(sg_count);
+		var trainingSetWithLable = [];
 
-		for (var i = 0; i < trainingSet.length; i++) {
-			trainingSet[i] = [];
-		};
+		// for (var i = 0; i < trainingSet.length; i++) {
+		// 	trainingSet[i] = [];
+		// };
 
-		for (var i = 0; i < this.norm_data.length; i++) {
-			var eachdataForSGs = new Array(sg_count);
-
-			for (var j = 0; j < eachdataForSGs.length; j++) {
-				eachdataForSGs[j] = [];
-			};
-
-			for (var j = 0; j < 300; j++) {
-				for (var k = 0; k < sg_count; k++) {
-					eachdataForSGs[k].push(this.norm_data[i]['data'][j][k]);
-				};	
-			}
-
+		for (var k = 0; k < this.norm_data.length; k++) {
+			var trainingSet = [];
 			for (var j = 0; j < sg_count; j++) {
-				trainingSet[j].push([eachdataForSGs[j] ,this.transferNameToId(this.norm_data[i]['type'])]);
+				for (var i = 0; i < Math.floor(this.dataLength); i++) {
+				
+					trainingSet.push(this.norm_data[k]['data'][i][j])
+				};	
 			};
+			console.log([ trainingSet ,this.transferNameToId(this.norm_data[k]['type'])]);
+			trainingSetWithLable.push([ trainingSet ,this.transferNameToId(this.norm_data[k]['type'])])
+			// var eachdataForSGs = new Array(sg_count);
+
+			// for (var j = 0; j < eachdataForSGs.length; j++) {
+			// 	eachdataForSGs[j] = [];
+			// };
+
+			// for (var j = 0; j < Math.floor(this.dataLength); j++) {
+			// 	for (var k = 0; k < sg_count; k++) {
+			// 		eachdataForSGs[k].push(this.norm_data[i]['data'][j][k]);
+			// 	};	
+			// }
+
+			// for (var j = 0; j < sg_count; j++) {
+			// 	trainingSet.push([eachdataForSGs[j] ,this.transferNameToId(this.norm_data[i]['type'])]);
+			// };
 		};
-		this.trainOneByOne(trainingSet, 0);
+		return trainingSetWithLable;
+		
+		// this.trainOneByOne(trainingSet, 0);
+	},
+	trainSVM: function(trainingSet)
+	{
+		var clf = new svm.SVM({
+			
+			svmType: 'C_SVC',
+		    // c: [2], 
+		    // kernels parameters 
+		    kernelType: 'POLY',
+		    
+		    reduce : false,
+		    probability : true,
+		    // gamma: [0.0078125],
+
+		});
+
+		clf.train(trainingSet)
+			.progress(function(progress){
+				console.log('training progress: %d%', Math.round(progress*100));
+			})
+			.spread(function (model, report) {
+				console.log();
+				fs.writeFileSync("./data/models/model.json" ,JSON.stringify(model))
+				fs.writeFileSync('./data/models/accuracy.txt', report['accuracy'] + '\n');
+				console.log('training report: %s', so(report));
+
+				var prediction = clf.predictSync([ 0,
+    0.49489795918367346,
+    1199.6581632653067,
+    313.35204081632656,
+    1706.7908163265304,
+    4887.576530612249,
+    11650.47448979592,
+    3492.005102040818,
+    2219.836734693879,
+    274.6479591836737,
+    8650.204081632648,
+    502.8112244897962,
+    1292.0918367346937,
+    604.2653061224489,
+    0,
+    3.3418367346938775,
+    81.29591836734691,
+    19434.520408163273 ]);
+
+				console.log(prediction);
+			});
+
+
 	},
 	trainOneByOne: function (trainingSet, index) {
 		if (index > trainingSet.length) {
@@ -79,10 +175,10 @@ var trainMgr = {
 		var clf = new svm.SVM({
 			
 			svmType: 'C_SVC',
-		    c: [2], 
+		    // c: [2], 
 		    // kernels parameters 
 		    kernelType: 'RBF',
-		    gamma: [0.0078125],
+		    // gamma: [0.0078125],
 
 		});
 		clf.train(trainingSet[index])
@@ -91,7 +187,7 @@ var trainMgr = {
 			})
 			.spread(function (model, report) {
 				console.log();
-				fs.writeFileSync("./data/models/model"+ index.toString() +".json" ,JSON.stringify(model))
+				fs.writeFileSync("./data/models/model"+ index.toString() +".json" ,so(model))
 				fs.appendFile('./data/models/accuracy.txt', report['accuracy'] + '\n');
 				console.log('training report: %s', so(report['accuracy']));
 				self.trainOneByOne(trainingSet, index+1);

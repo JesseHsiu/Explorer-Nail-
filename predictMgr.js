@@ -5,7 +5,7 @@ var svm = require('node-svm');
 var glob = require("glob");
 
 var predictMgr = {
-	predicter : new Array(9),
+	predicter : null,
 	validatedModel : new Array(9),
 	dataPort : null,
 	dataToPredict : null,
@@ -15,13 +15,17 @@ var predictMgr = {
 		this.dataPort = dataPort;
 		this.dataToPredict = [];
 
-		var files = glob.sync("./data/models/*.json");
+		var data = fs.readFileSync("./data/models/model.json");
+		this.predicter = svm.restore(JSON.parse(data));
+		
 
-		for (var i = 0; i < files.length; i++) {
-			var data = fs.readFileSync(files[i]);
-			this.predicter[i] = svm.restore(JSON.parse(data));
+		// var files = glob.sync("./data/models/model.json");
+
+		// for (var i = 0; i < files.length; i++) {
+			// var data = fs.readFileSync(files[i]);
+			// this.predicter[i] = svm.restore(JSON.parse(data));
 			// console.log(this.predicter[i]);
-		};
+		// };
 
 
 		// var tmp = [];
@@ -32,10 +36,10 @@ var predictMgr = {
 
 		// console.log(this.predicter[1].predictSync(tmp));
 
-		var accuracies = fs.readFileSync('./data/models/accuracy.txt').toString().split("\n");
+		// var accuracies = fs.readFileSync('./data/models/accuracy.txt').toString().split("\n");
 		
-		for (var i = 0; i < accuracies.length-1; i++) {
-			this.validatedModel[i] = accuracies[i];
+		// for (var i = 0; i < accuracies.length-1; i++) {
+			// this.validatedModel[i] = accuracies[i];
 			// if (parseFloat(accuracies[i]) > 0.8)
 			// {
 			// 	console.log('good');
@@ -45,27 +49,36 @@ var predictMgr = {
 			// 	console.log('bad');
 			// 	this.validatedModel[i] = false;
 			// }
-		};
+		// };
 
 	},
 	predict: function () {
 		
-		var norm_data = this.normalizeData();
-		var array = this.dataByOneSG(norm_data);
+		// var norm_data = this.normalizeData();
+		// var array = this.dataByOneSG(norm_data);
 		
-		for (var i = 0; i < 9; i++) {//Probabilities
-			var predictionLabel = this.predicter[i].predictSync(array[i]);
-			var prediction = this.predicter[i].predictProbabilitiesSync(array[i]);
+		// for (var i = 0; i < 9; i++) {//Probabilities
+		// 	var predictionLabel = this.predicter[i].predictSync(array[i]);
+		// 	var prediction = this.predicter[i].predictProbabilitiesSync(array[i]);
 			
-			if (this.validatedModel[i] > 0.8)
-			{
-				console.log(predictionLabel + " -> " + so(prediction));
-			}
-			else
-			{
-				console.log("not validated");
-			}
-		};
+		// 	if (this.validatedModel[i] > 0.8)
+		// 	{
+		// 		console.log(predictionLabel + " -> " + so(prediction));
+		// 	}
+		// 	else
+		// 	{
+		// 		console.log("not validated");
+		// 	}
+		// };
+		
+
+		var processedData = this.processDataByTime();
+		console.log(processedData);
+		var predictionLabel = this.predicter.predictProbabilitiesSync(processedData);
+		console.log(predictionLabel);
+		// var prediction = this.predicter.predictProbabilitiesSync(processedData);
+
+
 		this.dataToPredict = [];
 		this.tmpForDifferenct = [];
 
@@ -88,13 +101,39 @@ var predictMgr = {
 		return array;
 		
 	},
+	processDataByTime: function(){
+		var sg_count = this.dataToPredict[0].length;
+
+		var processedData = new Array(18);
+		for (var j = 0; j < processedData.length; j++) {
+			processedData[j] = 0;
+		};
+
+		var middle = Math.floor(this.dataToPredict.length / 2);
+
+		for (var i = 0; i < this.dataToPredict.length; i++) {
+
+			for (var j = 0; j < sg_count; j++) {
+
+				if (this.dataToPredict[i][j] >= 0)
+				{
+					processedData[j*2] += Math.abs(this.dataToPredict[i][j]) * Math.abs(middle - i) / middle;
+				}
+				else{
+					processedData[j*2 + 1] += Math.abs(this.dataToPredict[i][j]) * Math.abs(middle - i) /middle;;
+				}
+			};
+		}
+
+		return processedData;
+	},
 	normalizeData: function () {
 		
-		var step = this.dataToPredict.length/300.0;
+		var step = this.dataToPredict.length/30.0;
 		var currentStep = 0.0;
 		var normalizedData = [];
 		
-		for (var j = 0; j < 300; j++) {
+		for (var j = 0; j < 30; j++) {
 			normalizedData.push(this.dataToPredict[Math.floor(currentStep)]);
 			currentStep += step;
 		};
