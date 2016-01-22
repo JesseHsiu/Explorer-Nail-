@@ -1,6 +1,8 @@
 extends layout
 
 block content
+	link(rel='stylesheet', href='/stylesheets/c3.min.css')
+	script(src='./javascripts/c3.min.js')
 	.jumbotron
 		h2 Learning
 		br
@@ -25,5 +27,5 @@ block content
 		h2 SG Values
 			h3#value
 		h4 Status
-			#graph
+			#chart
 		script(src='./javascripts/learning_client.js')
