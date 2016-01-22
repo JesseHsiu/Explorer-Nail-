@@ -45,6 +45,7 @@ router.get('/cleardata', function(req, res, next) {
 
   shell.rm('./data/training/*');
   shell.rm('./data/models/*');
+  trainMgr.clearModel();
   res.writeHead(200, {'Content-Type': 'text/plain'});
   res.end();
 });

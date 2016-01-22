@@ -3,6 +3,7 @@ var fs = require('fs');
 var so = require('stringify-object');
 var svm = require('node-svm');
 var glob = require("glob");
+var shell = require('shelljs');
 
 var predictMgr = {
 	predicter : null,
@@ -15,8 +16,8 @@ var predictMgr = {
 		this.dataPort = dataPort;
 		this.dataToPredict = [];
 
-		var data = fs.readFileSync("./data/models/model.json");
-		this.predicter = svm.restore(JSON.parse(data));
+		// var data = fs.readFileSync("./data/models/model.json");
+		// this.predicter = svm.restore(JSON.parse(data));
 		
 
 		// var files = glob.sync("./data/models/model.json");
@@ -74,10 +75,35 @@ var predictMgr = {
 
 		var processedData = this.processDataByTime();
 		console.log(processedData);
-		var predictionLabel = this.predicter.predictProbabilitiesSync(processedData);
-		console.log(predictionLabel);
-		// var prediction = this.predicter.predictProbabilitiesSync(processedData);
+		for (var i = 0; i < processedData.length; i++) {
+			fs.appendFileSync("./data/ML/mlFiles/predict.csv", processedData[i].toString() + ',');
+		};
+		fs.appendFileSync("./data/ML/mlFiles/predict.csv", '0');
 
+		shell.cd('data');
+		shell.cd('ML');
+		shell.cd('mlFiles');
+		// shell.rm('./predict.csv');
+		// shell.rm('./predict.ml');
+		shell.exec('python csv2libsvm.py predict.csv', {silent:true,async:false});
+
+		shell.exec('python easy.py train.ml predict.ml', {silent:true,async:false});
+
+		var data = fs.readFileSync('./data/ML/mlFiles/predict.ml.predict', 'utf8');
+
+		// data = data.split("\n");
+          // console.log(data);
+          // var resultOfML = data[0];
+          console.log(data);
+
+  //       shell.rm('./predict.csv');
+  //       shell.rm('./predict.ml');
+
+
+
+	    shell.cd('..');
+	    shell.cd('..');
+	    shell.cd('..');
 
 		this.dataToPredict = [];
 		this.tmpForDifferenct = [];
@@ -96,10 +122,8 @@ var predictMgr = {
 				array[i].push(norm_data[j][i]);
 			};
 		};
-		// console.log(array[1]);
 
 		return array;
-		
 	},
 	processDataByTime: function(){
 		var sg_count = this.dataToPredict[0].length;
@@ -141,10 +165,7 @@ var predictMgr = {
 		return normalizedData;
 	},
 	storeNeedToPredictData: function (data) {
-		// console.log(base);
 
-		// this.dataToStore.push(base);
-		// console.log(base);
 		needToStoreData = data.split(" ");
 		if (this.tmpForDifferenct.length != 0)
 		{
@@ -161,18 +182,6 @@ var predictMgr = {
 				this.tmpForDifferenct.push(needToStoreData[i]);
 			};
 		}
-
-
-		// if (this.tmpForDifferenct != null)
-		// {
-		// 	var datas = [];
-		// 	for (var i = 1; i < needToStoreData.length-1; i++) {
-		// 		datas.push(needToStoreData[i] - this.tmpForDifferenct[i-1]);
-		// 	};
-		// 	this.dataToPredict.push(datas);
-		// };
-
-		// this.tmpForDifferenct = base;
 	},
 	collectDataOnPort: function () {
 		this.dataPort.on('data',this.storeNeedToPredictData);

@@ -2,6 +2,7 @@ var app = require('./app.js');
 var fs = require('fs');
 var so = require('stringify-object');
 var svm = require('node-svm');
+var shell = require('shelljs');
 
 
 var trainMgr = {
@@ -21,6 +22,10 @@ var trainMgr = {
 	train: function(){
 		var processedData = this.processDataByTime();
 		this.trainSVM(processedData);
+	},
+	clearModel: function(){
+		shell.rm('./data/ML/mlFiles/train.csv');
+		shell.rm('./data/ML/mlFiles/train.ml');
 	},
 	processDataByTime: function (){
 		var sg_count = this.data[0]['data'][0].length;
@@ -118,50 +123,69 @@ var trainMgr = {
 	},
 	trainSVM: function(trainingSet)
 	{
-		var clf = new svm.SVM({
+		for (var i = 0; i < trainingSet.length; i++) {
 			
-			svmType: 'C_SVC',
-		    // c: [2], 
-		    // kernels parameters 
-		    kernelType: 'POLY',
+			// Data
+			for (var j = 0; j < trainingSet[i][0].length; j++) {
+				fs.appendFileSync( "./data/ML/mlFiles/train.csv",(trainingSet[i][0][j]).toString() + ",");
+			};
+
+			// Label
+			fs.appendFileSync( "./data/ML/mlFiles/train.csv",(trainingSet[i][1]).toString() + "\n");
+		};
+
+
+		shell.cd('data');
+		shell.cd('ML');
+		shell.cd('mlFiles');
+		shell.exec('python csv2libsvm.py train.csv', {silent:true,async:false});
+		shell.cd('..')
+		shell.cd('..')
+		shell.cd('..')
+		// var clf = new svm.SVM({
+			
+		// 	svmType: 'C_SVC',
+		//     // c: [2], 
+		//     // kernels parameters 
+		//     kernelType: 'POLY',
 		    
-		    reduce : false,
-		    probability : true,
-		    // gamma: [0.0078125],
+		//     reduce : false,
+		//     probability : true,
+		//     // gamma: [0.0078125],
 
-		});
+		// });
 
-		clf.train(trainingSet)
-			.progress(function(progress){
-				console.log('training progress: %d%', Math.round(progress*100));
-			})
-			.spread(function (model, report) {
-				console.log();
-				fs.writeFileSync("./data/models/model.json" ,JSON.stringify(model))
-				fs.writeFileSync('./data/models/accuracy.txt', report['accuracy'] + '\n');
-				console.log('training report: %s', so(report));
+		// clf.train(trainingSet)
+		// 	.progress(function(progress){
+		// 		console.log('training progress: %d%', Math.round(progress*100));
+		// 	})
+		// 	.spread(function (model, report) {
+		// 		console.log();
+		// 		fs.writeFileSync("./data/models/model.json" ,JSON.stringify(model))
+		// 		fs.writeFileSync('./data/models/accuracy.txt', report['accuracy'] + '\n');
+		// 		console.log('training report: %s', so(report));
 
-				var prediction = clf.predictSync([ 0,
-    0.49489795918367346,
-    1199.6581632653067,
-    313.35204081632656,
-    1706.7908163265304,
-    4887.576530612249,
-    11650.47448979592,
-    3492.005102040818,
-    2219.836734693879,
-    274.6479591836737,
-    8650.204081632648,
-    502.8112244897962,
-    1292.0918367346937,
-    604.2653061224489,
-    0,
-    3.3418367346938775,
-    81.29591836734691,
-    19434.520408163273 ]);
+		// 		var prediction = clf.predictSync([ 0,
+  //   0.49489795918367346,
+  //   1199.6581632653067,
+  //   313.35204081632656,
+  //   1706.7908163265304,
+  //   4887.576530612249,
+  //   11650.47448979592,
+  //   3492.005102040818,
+  //   2219.836734693879,
+  //   274.6479591836737,
+  //   8650.204081632648,
+  //   502.8112244897962,
+  //   1292.0918367346937,
+  //   604.2653061224489,
+  //   0,
+  //   3.3418367346938775,
+  //   81.29591836734691,
+  //   19434.520408163273 ]);
 
-				console.log(prediction);
-			});
+		// 		console.log(prediction);
+		// 	});
 
 
 	},
