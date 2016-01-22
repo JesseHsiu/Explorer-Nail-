@@ -33,6 +33,8 @@ var saveMgr = {
 			for (var i = 1; i < needToStoreData.length-1; i++) {
 				datas.push(needToStoreData[i] - this.tmpForDifferenct[i-1]);
 			};
+			console.log(datas);
+			// console.log(needToStoreData[i] - this.tmpForDifferenct[i-1]);
 			this.dataToStore.push(datas);
 		}
 		else{
@@ -42,10 +44,6 @@ var saveMgr = {
 			};
 		}
 
-		
-		
-		
-		// this.csvStream.write({sg0: needToStoreData[1] - 512, sg2: needToStoreData[2] - 512, sg3: needToStoreData[3] - 512, sg4: needToStoreData[4] - 512, sg5: needToStoreData[5] - 512, sg6: needToStoreData[6] - 512, sg7: needToStoreData[7] - 512, sg8: needToStoreData[8] - 512, sg9: needToStoreData[9] - 512});
 	},
 
 	writeEnd: function (data) {
@@ -71,6 +69,7 @@ var saveMgr = {
 			fs.writeFileSync(this.filePath, configJSON);
 		}
 		this.tmpForDifferenct = [];
+		this.dataToStore = [];
 	}
 }
 
