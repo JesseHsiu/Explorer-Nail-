@@ -13,7 +13,7 @@ var instance = null;
 /* GET home page. */
 
 router.get('/', function(req, res, next) {
-  res.render('record', { title: 'Record' });
+  res.render('status', { title: 'Record' });
 });
 
 router.get('/start/:filename', function(req, res, next) {

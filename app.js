@@ -6,10 +6,10 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var routes = require('./routes/index');
-var records = require('./routes/records');
+var status = require('./routes/status');
 var showdata = require('./routes/showdata');
 var detectgesture = require('./routes/detectgesture');
-var learning = require('./routes/learning');
+var training = require('./routes/training');
 
 var app = express();
 
@@ -48,15 +48,15 @@ var SerialPort = serialport.SerialPort; // localize object constructor
 // });
 
 
-app.locals.sp = new SerialPort("/dev/cu.usbserial-AI02SSRK", {
-  parser: serialport.parsers.readline("\n"),
-  baudrate: 38400
-});
+// app.locals.sp = new SerialPort("/dev/cu.usbserial-AI02SSRK", {
+//   parser: serialport.parsers.readline("\n"),
+//   baudrate: 38400
+// });
 
-app.locals.sp.on("data", function (msg) {
-  var receivedString = String(msg);
-  handlerForNewData(receivedString);
-})
+// app.locals.sp.on("data", function (msg) {
+//   var receivedString = String(msg);
+//   handlerForNewData(receivedString);
+// })
 
 var handlerForNewData = function(datas) {
   var storeDataToArray = datas.split(" ");
@@ -109,10 +109,10 @@ app.get('/reopenPort', function(req, res){
 
 });
 
-app.use('/records', records);
+app.use('/status', status);
 app.use('/showdata', showdata);
 app.use('/detectgesture', detectgesture);
-app.use('/learning',learning);
+app.use('/training',training);
 app.use('/', routes);
 
 
