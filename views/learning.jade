@@ -10,22 +10,13 @@ block content
 		button#clearBtn.btn.btn-danger(type='button', onclick="cleanBtnClick()") Clean All Data
 		button#clearBtn.btn.btn-success(type='button', onclick="trainByTheData()") Train Data
 		br
-		h4 Select Type Of Input
 		br
-		input(type='radio', name='type', value='left')
-		|	Left  
-		input(type='radio', name='type', value='right')
-		|	Right  
-		input(type='radio', name='type', value='up')
-		|	Up  
-		input(type='radio', name='type', value='down')
-		|	Down  
-		input(type='radio', name='type', value='check')
-		|	Check
-		br
-		br
-		h2 SG Values
-			h3#value
+		div#doneNotification
+			.alert.alert-success(role='alert')
+				p Training Done
+		h4 Type And Count
+			#Type
+			#Round
 		h4 Status
 			#chart
 		script(src='./javascripts/learning_client.js')

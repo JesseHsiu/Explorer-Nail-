@@ -10,7 +10,7 @@ var trainMgr = {
 	folder : null,
 	data: null,
 	norm_data : null,
-	dataLength : 50.0,
+	dataLength : 10.0,
 	init: function (folder)
 	{
 		this.folder = folder;
@@ -20,6 +20,7 @@ var trainMgr = {
 	},
 
 	train: function(){
+		// this.equalLength();
 		var processedData = this.processDataByTime();
 		this.trainSVM(processedData);
 	},
@@ -46,15 +47,15 @@ var trainMgr = {
 
 					if (this.data[i]['data'][k][j] >= 0)
 					{
-						trainingSet[j*2] += Math.abs(this.data[i]['data'][k][j]) * Math.abs(middle - k) / middle;
+						trainingSet[j*2] += Math.abs(this.data[i]['data'][k][j]);
 					}
 					else{
-						trainingSet[j*2 + 1] += Math.abs(this.data[i]['data'][k][j]) * Math.abs(middle - k) /middle;;
+						trainingSet[j*2 + 1] += Math.abs(this.data[i]['data'][k][j]);
 					}
 				};	
 			};
-			console.log([ trainingSet ,this.transferNameToId(this.data[i]['type'])]);
-			trainingSetWithLable.push([ trainingSet ,this.transferNameToId(this.data[i]['type'])])
+			console.log([ trainingSet ,this.data[i]['type']]);
+			trainingSetWithLable.push([ trainingSet ,this.data[i]['type']])
 		}
 
 		return trainingSetWithLable;
@@ -99,8 +100,8 @@ var trainMgr = {
 					trainingSet.push(this.norm_data[k]['data'][i][j])
 				};	
 			};
-			console.log([ trainingSet ,this.transferNameToId(this.norm_data[k]['type'])]);
-			trainingSetWithLable.push([ trainingSet ,this.transferNameToId(this.norm_data[k]['type'])])
+			console.log([ trainingSet ,this.norm_data[k]['type']]);
+			trainingSetWithLable.push([ trainingSet ,this.norm_data[k]['type']])
 			// var eachdataForSGs = new Array(sg_count);
 
 			// for (var j = 0; j < eachdataForSGs.length; j++) {
@@ -164,30 +165,6 @@ var trainMgr = {
 		// 		fs.writeFileSync("./data/models/model.json" ,JSON.stringify(model))
 		// 		fs.writeFileSync('./data/models/accuracy.txt', report['accuracy'] + '\n');
 		// 		console.log('training report: %s', so(report));
-
-		// 		var prediction = clf.predictSync([ 0,
-  //   0.49489795918367346,
-  //   1199.6581632653067,
-  //   313.35204081632656,
-  //   1706.7908163265304,
-  //   4887.576530612249,
-  //   11650.47448979592,
-  //   3492.005102040818,
-  //   2219.836734693879,
-  //   274.6479591836737,
-  //   8650.204081632648,
-  //   502.8112244897962,
-  //   1292.0918367346937,
-  //   604.2653061224489,
-  //   0,
-  //   3.3418367346938775,
-  //   81.29591836734691,
-  //   19434.520408163273 ]);
-
-		// 		console.log(prediction);
-		// 	});
-
-
 	},
 	trainOneByOne: function (trainingSet, index) {
 		if (index > trainingSet.length) {
