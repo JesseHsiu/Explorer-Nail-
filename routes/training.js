@@ -12,7 +12,7 @@ var stateMachine = {
 var state = stateMachine.IDLE;
 
 router.get('/', function(req, res, next) {
-	res.render('learning', { title: 'Learning' });
+	res.render('training', { title: 'Learning' });
 });
 
 router.get('/start/:filename', function(req, res, next) {
