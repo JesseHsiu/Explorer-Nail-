@@ -43,13 +43,13 @@ var trainMgr = {
 				var middle = Math.floor(lengthOfRawData / 2);
 				for (var k = 0; k < this.data[i]['data'].length; k++) {
 					
-
+					console.log(this.data[i]['data'][k][j]);
 					if (this.data[i]['data'][k][j] >= 0)
 					{
-						trainingSet[j*2] += Math.abs(this.data[i]['data'][k][j]) * Math.abs(middle - k) / middle;
+						trainingSet[j*2] += Math.abs(this.data[i]['data'][k][j]);
 					}
 					else{
-						trainingSet[j*2 + 1] += Math.abs(this.data[i]['data'][k][j]) * Math.abs(middle - k) /middle;;
+						trainingSet[j*2 + 1] += Math.abs(this.data[i]['data'][k][j]);
 					}
 				};	
 			};
