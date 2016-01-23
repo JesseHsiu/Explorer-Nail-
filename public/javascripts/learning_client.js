@@ -18,7 +18,7 @@ function recordBtnClick () {
 	if (state == record_state.IDLE)
 	{
 		$.ajax({
-            url: 'http://127.0.0.1:3000/learning/start/'+ currentType.toString(),
+            url: 'http://127.0.0.1:3000/training/start/'+ currentType.toString(),
             cache: false,
             timeout: 5000
         });
@@ -27,7 +27,7 @@ function recordBtnClick () {
 		$("#recordBtn").text(" End Record ");
 	}
 	else if ( state == record_state.RECORDING){
-		$.get("/learning/end", function(data, status){
+		$.get("/training/end", function(data, status){
 			state = record_state.IDLE;
 			$("#recordBtn").removeClass("btn-danger");
 			$("#recordBtn").text("Start Record");
@@ -56,7 +56,7 @@ function recordBtnClick () {
 }
 function cleanBtnClick () {
 	$.ajax({
-        url: 'http://127.0.0.1:3000/learning/cleardata',
+        url: 'http://127.0.0.1:3000/training/cleardata',
         cache: false,
         timeout: 5000
     });
@@ -68,7 +68,7 @@ function cleanBtnClick () {
 
 function trainByTheData () {
 	$.ajax({
-        url: 'http://127.0.0.1:3000/learning/trainCurrentData',
+        url: 'http://127.0.0.1:3000/training/trainCurrentData',
         cache: false,
         timeout: 5000
     });

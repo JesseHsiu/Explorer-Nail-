@@ -1,3 +1,10 @@
 /public/data
 /node_modules
 *.json
+*.csv
+*.ml
+*.model
+*.range
+*.out
+*.predict
+*.scale
