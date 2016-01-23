@@ -3,7 +3,8 @@ var fs = require('fs');
 var so = require('stringify-object');
 var svm = require('node-svm');
 var shell = require('shelljs');
-
+var path = require('path');
+var stable = require('stable');
 
 var trainMgr = {
 	filePath : null,
@@ -216,7 +217,78 @@ var trainMgr = {
 			return 4;
 		}
 		
+	},
+
+	createFoldsValidationFiles : function (filePath, numOfFolds) {
+		var pathParse = path.parse(filePath);
+		
+		var lines = fs.readFileSync(filePath, 'utf8').split('\n');
+
+		if (typeof lines[lines.length-1][0] === 'undefined') {
+			lines.splice(lines.length-1, 1);
+		};
+
+		var twoDimArray = this.get2DArrayDataFromDataLines(lines);
+
+		for (var i = 0; i < numOfFolds; i++) {
+			var trainFilePath = path.join(pathParse.dir, pathParse.name + i + pathParse.ext);
+			var predictFilePath = path.join(pathParse.dir, "predict" + i + pathParse.ext);
+			var foldData = this.getTrainAndPredictFoldData(i, numOfFolds, twoDimArray);
+			// console.log(foldData);
+
+			var trainWriteFile = fs.createWriteStream(trainFilePath);
+			var predictWriteFile = fs.createWriteStream(predictFilePath);
+			trainWriteFile.on('error', function(err){});
+			predictWriteFile.on('error', function(err){});
+
+			foldData.train.forEach(function(v){trainWriteFile.write(v + '\n');});
+			foldData.predict.forEach(function(v){predictWriteFile.write(v + '\n');});
+
+			trainWriteFile.end();
+			predictWriteFile.end();
+		};
+	},
+
+	get2DArrayDataFromDataLines : function(lines){
+		var twoDimArray = [];
+		var sortedLines = stable(lines, function(a, b){return parseInt(a[0]) > parseInt(b[0]);});
+
+		var currentLineLabel = sortedLines[0][0];
+		var numOfElemOfLabel = 0;
+		var i = 0;
+		for (; i < sortedLines.length; i++) {
+			if (sortedLines[i][0] != currentLineLabel) {
+				currentLineLabel = sortedLines[i][0];
+				twoDimArray.push(sortedLines.slice(i - numOfElemOfLabel, i));
+				numOfElemOfLabel = 0;
+			};
+			numOfElemOfLabel++;
+		};
+
+		twoDimArray.push(sortedLines.slice(i - numOfElemOfLabel, i));
+		// console.log(twoDimArray);
+		return twoDimArray;
+	},
+
+	getTrainAndPredictFoldData : function(nthFold, numOfFolds, twoDimArray){
+		var foldData = {"train" : [], "predict" : []};
+		for (var i = 0; i < twoDimArray.length; i++) {
+			var numOfPredictElem = twoDimArray[i].length/numOfFolds;
+			var predictBeginIdx = Math.min(Math.floor(nthFold * numOfPredictElem), twoDimArray[i].length);
+			var predictEndIdx = Math.min(Math.floor(nthFold * numOfPredictElem + numOfPredictElem), twoDimArray[i].length);
+			var numOfTruePredictElem = predictEndIdx - predictBeginIdx;
+
+			var shallowCopy = twoDimArray[i].slice();
+			var predictData = shallowCopy.splice(predictBeginIdx, numOfTruePredictElem);
+
+			foldData.train = foldData.train.concat(shallowCopy);
+			foldData.predict = foldData.predict.concat(predictData);
+		};
+
+		return foldData;
 	}
 }
+
+trainMgr.createFoldsValidationFiles("./data/ML/mlFiles/train.ml", 4);
 
 module.exports = trainMgr;
