@@ -22,40 +22,46 @@ var trainMgr = {
 
 	train: function(){
 		// this.equalLength();
-		var processedData = this.processDataByTime();
+		
+
+
+
+		var processedData = this.processDataByTime(3);
 		this.trainSVM(processedData);
 	},
 	clearModel: function(){
 		shell.rm('./data/ML/mlFiles/train.csv');
 		shell.rm('./data/ML/mlFiles/train.ml');
 	},
-	processDataByTime: function (){
+	processDataByTime: function (numOfGroups){
 		var sg_count = this.data[0]['data'][0].length;
 		var trainingSetWithLable = [];
 
 		for (var i = 0; i < this.data.length; i++) {
 			var lengthOfRawData = this.data[i]['data'].length;
-			var trainingSet = new Array(18);
+			var trainingSet = new Array(sg_count * 2 * numOfGroups);
 
 			for (var j = 0; j < trainingSet.length; j++) {
 				trainingSet[j] = 0;
 			};
 
 			for (var j = 0; j < sg_count; j++) {
-				var middle = Math.floor(lengthOfRawData / 2);
-				for (var k = 0; k < this.data[i]['data'].length; k++) {
+				// var middle = Math.floor(lengthOfRawData / 2);
+				for (var k = 0; k < lengthOfRawData; k++) {
+
+					var indexOfGroup = Math.floor(k / (lengthOfRawData/numOfGroups))
 					
-					console.log(this.data[i]['data'][k][j]);
+					console.log(indexOfGroup);
 					if (this.data[i]['data'][k][j] >= 0)
 					{
-						trainingSet[j*2] += Math.abs(this.data[i]['data'][k][j]);
+						trainingSet[j*2 + sg_count*2 * indexOfGroup] += Math.abs(this.data[i]['data'][k][j]);
 					}
 					else{
-						trainingSet[j*2 + 1] += Math.abs(this.data[i]['data'][k][j]);
+						trainingSet[j*2 + 1 + sg_count*2 * indexOfGroup] += Math.abs(this.data[i]['data'][k][j]);
 					}
 				};	
 			};
-			console.log([ trainingSet ,this.data[i]['type']]);
+			// console.log([ trainingSet ,this.data[i]['type']]);
 			trainingSetWithLable.push([ trainingSet ,this.data[i]['type']])
 		}
 
@@ -289,6 +295,6 @@ var trainMgr = {
 	}
 }
 
-trainMgr.createFoldsValidationFiles("./data/ML/mlFiles/train.ml", 4);
+// trainMgr.createFoldsValidationFiles("./data/ML/mlFiles/train.ml", 4);
 
 module.exports = trainMgr;
