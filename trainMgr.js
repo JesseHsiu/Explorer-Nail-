@@ -26,8 +26,10 @@ var trainMgr = {
 
 
 
-		var processedData = this.processDataByTime(3);
-		this.trainSVM(processedData);
+		// var processedData = this.processDataByTime(3);
+		// this.trainSVM(processedData);
+
+		this.crossValidation('./data/ML/mlFiles/train.ml',10);
 	},
 	clearModel: function(){
 		shell.rm('./data/ML/mlFiles/train.csv');
@@ -261,13 +263,13 @@ var trainMgr = {
 
 	get2DArrayDataFromDataLines : function(lines){
 		var twoDimArray = [];
-		var sortedLines = stable(lines, function(a, b){return parseInt(a[0]) > parseInt(b[0]);});
+		var sortedLines = stable(lines, function(a, b){return parseInt(a.split(' ')[0]) > parseInt(b.split(' ')[0]);});
 
-		var currentLineLabel = sortedLines[0][0];
+		var currentLineLabel = parseInt(sortedLines[0].split(' ')[0]);
 		var numOfElemOfLabel = 0;
 		var i = 0;
 		for (; i < sortedLines.length; i++) {
-			if (sortedLines[i][0] != currentLineLabel) {
+			if (parseInt(sortedLines[i].split(' ')[0]) != currentLineLabel) {
 				currentLineLabel = sortedLines[i][0];
 				twoDimArray.push(sortedLines.slice(i - numOfElemOfLabel, i));
 				numOfElemOfLabel = 0;
@@ -342,13 +344,17 @@ var trainMgr = {
 			if (typeof predictResultFileLines[predictResultFileLines.length-1][0] === 'undefined') {
 				predictResultFileLines.splice(predictResultFileLines.length-1, 1);
 			};
-
+			console.log("fold : " + i + "---------------------------");
 			var matchCount = 0;
 			for (var j = 0; j < predictFileLines.length; j++) {
-				if (predictFileLines[j][0] == predictResultFileLines[j][0]){
+
+				console.log("predictFileLines[j][0] = " + predictFileLines[j].split(' ')[0]);
+				console.log("predictResultFileLines[j][0] = " + predictResultFileLines[j]);
+				if (parseInt(predictFileLines[j].split(' ')[0]) == parseInt(predictResultFileLines[j])){
 					matchCount++;
 				}
 			};
+			console.log("matchCount " + matchCount);
 			finalAccuracy += matchCount/predictFileLines.length;
 		};
 		finalAccuracy /= numOfFolds;
