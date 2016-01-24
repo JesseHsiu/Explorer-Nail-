@@ -5,6 +5,7 @@ var svm = require('node-svm');
 var shell = require('shelljs');
 var path = require('path');
 var stable = require('stable');
+// var csv = require('csv');
 
 var trainMgr = {
 	filePath : null,
@@ -233,17 +234,18 @@ var trainMgr = {
 
 		var pathParse = path.parse(filePath);
 
-		shell.cd('./data/ML/mlFiles');
-		for (var i = 0; i < numOfFolds; i++) {
-			var trainFilePath = pathParse.name + i + pathParse.ext;
-			var predictFilePath = "predict" + i + pathParse.ext;
+		// shell.cd('./data/ML/mlFiles');
+		// for (var i = 0; i < numOfFolds; i++) {
+		// 	var trainFilePath = pathParse.name + i + pathParse.ext;
+		// 	var predictFilePath = "predict" + i + pathParse.ext;
 
-			shell.exec('python easy.py ' + trainFilePath + ' ' + predictFilePath, {silent:false,async:false});
-		};
-		shell.cd('../../..');
+		// 	shell.exec('python easy.py ' + trainFilePath + ' ' + predictFilePath, {silent:false,async:false});
+		// };
+		// shell.cd('../../..');
 
 		var finalResult = this.computeResults(filePath, numOfFolds, twoDimArray);
 		console.log("finalResult.accuracy = " + finalResult.accuracy);
+		this.outputConfusionMat(pathParse.dir, "confusionMatrix.csv", finalResult.confusionMat);
 		return finalResult;
 	},
 
@@ -374,6 +376,40 @@ var trainMgr = {
 				return i;
 			};
 		};
+	},
+
+	outputConfusionMat : function (filePath, filename, confusionMat){
+		var fullFileName = path.join(filePath, filename);
+		
+		// var writeFileStream = fs.createWriteStream(fullFileName);
+		// writeFileStream.on('error', function (err){});
+
+		// for (var i = 0; i < confusionMat.length; i++) {
+		// 	for (var j = 0; j < confusionMat[i].length; j++) {
+		// 		if (j == confusionMat[i].length - 1) {
+		// 			writeFileStream.write(confusionMat[i][j]);
+		// 			// console.log("if : " + confusionMat[i][j]);
+		// 		} else {
+		// 			writeFileStream.write(confusionMat[i][j] + ", ");
+		// 			// console.log("else : " + confusionMat[i][j]);
+		// 		};
+		// 	};
+		// 	writeFileStream.write('\n');
+		// };
+		// writeFileStream.end();
+
+		var outputString = "";
+		for (var i = 0; i < confusionMat.length; i++) {
+			for (var j = 0; j < confusionMat[i].length; j++) {
+				if (j == confusionMat[i].length - 1) {
+					outputString += confusionMat[i][j];
+				} else {
+					outputString += confusionMat[i][j] + ", ";
+				};
+			};
+			outputString += '\n';
+		};
+		fs.writeFileSync(fullFileName, outputString);
 	}
 }
 
