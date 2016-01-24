@@ -314,7 +314,9 @@ var trainMgr = {
 			shell.exec('python easy.py ' + trainFilePath + ' ' + predictFilePath, {silent:false,async:false});
 		};
 		shell.cd('../../..');
-		console.log(this.computeAccuracy(filePath, numOfFolds));
+		var finalResult = this.computeAccuracy(filePath, numOfFolds);
+		console.log(finalResult);
+		return finalResult;
 	},
 
 	computeAccuracy : function (filePath, numOfFolds){
