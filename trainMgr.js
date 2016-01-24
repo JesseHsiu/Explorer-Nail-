@@ -329,7 +329,7 @@ var trainMgr = {
 
 	computeResults : function (filePath, numOfFolds, twoDimArray){
 		var pathParse = path.parse(filePath);
-		var results = {"accuracy" : 0, "confusionMat" : this.zeros(twoDimArray.length, twoDimArray.length)};
+		var results = {"accuracy" : 0, "confusionMat" : this.zeros([twoDimArray.length, twoDimArray.length])};
 
 		for (var i = 0; i < numOfFolds; i++) {
 			var predictFilePath = path.join(pathParse.dir, "predict" + i + pathParse.ext);
@@ -348,23 +348,24 @@ var trainMgr = {
 				if (predictLabel == predictResultLabel){
 					matchCount++;
 				};
+				results.confusionMat[predictLabelIdx][predictResultIdx]++;
 			};
 			// console.log("matchCount " + matchCount);
 			results.accuracy += matchCount/predictFileLines.length;
 		};
+		// console.log("results.confusionMat : \n" + results.confusionMat);
 		results.accuracy /= numOfFolds;
 		return results;
 	},
 
-	zeros : function (iMax, jMax){
-		var mat = new Array(iMax);
-		for (var i = 0; i < iMax; i++) {
-			mat[i] = new Array(jMax);
-			for (var j = 0; j < jMax; j++) {
-				mat[i][j] = 0;
-			};
-		};
-		return mat;
+	zeros : function (dimensions) {
+		var array = [];
+
+		for (var i = 0; i < dimensions[0]; ++i) {
+			array.push(dimensions.length == 1 ? 0 : this.zeros(dimensions.slice(1)));
+		}
+
+	   return array;
 	},
 
 	getIdxByLabelFrom2DArray : function (label, twoDimArray){
