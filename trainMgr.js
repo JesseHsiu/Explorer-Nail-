@@ -227,16 +227,64 @@ var trainMgr = {
 		
 	},
 
-	createFoldsValidationFiles : function (filePath, numOfFolds) {
+	crossValidation : function (filePath, numOfFolds){
+		var twoDimArray = this.createOrganized2DArrayDataFromFile(filePath);
+		this.createFoldsValidationFiles(filePath, numOfFolds, twoDimArray);
+
 		var pathParse = path.parse(filePath);
-		
+
+		shell.cd('./data/ML/mlFiles');
+		for (var i = 0; i < numOfFolds; i++) {
+			var trainFilePath = pathParse.name + i + pathParse.ext;
+			var predictFilePath = "predict" + i + pathParse.ext;
+
+			shell.exec('python easy.py ' + trainFilePath + ' ' + predictFilePath, {silent:false,async:false});
+		};
+		shell.cd('../../..');
+
+		var finalResult = this.computeResults(filePath, numOfFolds, twoDimArray);
+		console.log("finalResult.accuracy = " + finalResult.accuracy);
+		return finalResult;
+	},
+
+	readFileWithEachLineIntoArray : function(filePath){
 		var lines = fs.readFileSync(filePath, 'utf8').split('\n');
 
 		if (typeof lines[lines.length-1][0] === 'undefined') {
 			lines.splice(lines.length-1, 1);
 		};
+		return lines;
+	},
 
-		var twoDimArray = this.get2DArrayDataFromDataLines(lines);
+	createOrganized2DArrayDataFromFile : function(filePath){
+		var lines = this.readFileWithEachLineIntoArray(filePath);
+
+		return this.get2DArrayDataFromDataLines(lines);
+	},
+
+	get2DArrayDataFromDataLines : function(lines){
+		var twoDimArray = [];
+		var sortedLines = stable(lines, function(a, b){return parseInt(a.split(' ')[0]) > parseInt(b.split(' ')[0]);});
+
+		var currentLineLabel = parseInt(sortedLines[0].split(' ')[0]);
+		var numOfElemOfLabel = 0;
+		var i = 0;
+		for (; i < sortedLines.length; i++) {
+			if (parseInt(sortedLines[i].split(' ')[0]) != currentLineLabel) {
+				currentLineLabel = parseInt(sortedLines[i].split(' ')[0]);
+				twoDimArray.push(sortedLines.slice(i - numOfElemOfLabel, i));
+				numOfElemOfLabel = 0;
+			};
+			numOfElemOfLabel++;
+		};
+
+		twoDimArray.push(sortedLines.slice(i - numOfElemOfLabel, i));
+		// console.log(twoDimArray);
+		return twoDimArray;
+	},
+
+	createFoldsValidationFiles : function (filePath, numOfFolds, twoDimArray) {
+		var pathParse = path.parse(filePath);
 
 		for (var i = 0; i < numOfFolds; i++) {
 			var trainFilePath = path.join(pathParse.dir, pathParse.name + i + pathParse.ext);
@@ -261,27 +309,6 @@ var trainMgr = {
 		};
 	},
 
-	get2DArrayDataFromDataLines : function(lines){
-		var twoDimArray = [];
-		var sortedLines = stable(lines, function(a, b){return parseInt(a.split(' ')[0]) > parseInt(b.split(' ')[0]);});
-
-		var currentLineLabel = parseInt(sortedLines[0].split(' ')[0]);
-		var numOfElemOfLabel = 0;
-		var i = 0;
-		for (; i < sortedLines.length; i++) {
-			if (parseInt(sortedLines[i].split(' ')[0]) != currentLineLabel) {
-				currentLineLabel = parseInt(sortedLines[i].split(' ')[0]);
-				twoDimArray.push(sortedLines.slice(i - numOfElemOfLabel, i));
-				numOfElemOfLabel = 0;
-			};
-			numOfElemOfLabel++;
-		};
-
-		twoDimArray.push(sortedLines.slice(i - numOfElemOfLabel, i));
-		// console.log(twoDimArray);
-		return twoDimArray;
-	},
-
 	getTrainAndPredictFoldData : function(nthFold, numOfFolds, twoDimArray){
 		var foldData = {"train" : [], "predict" : []};
 		for (var i = 0; i < twoDimArray.length; i++) {
@@ -300,69 +327,56 @@ var trainMgr = {
 		return foldData;
 	},
 
-	crossValidation : function (filePath, numOfFolds){
-		this.createFoldsValidationFiles(filePath, numOfFolds);
-
+	computeResults : function (filePath, numOfFolds, twoDimArray){
 		var pathParse = path.parse(filePath);
-		// for (var i = 0; i < numOfFolds; i++) {
-		// 	var trainFilePath = path.join(pathParse.dir, pathParse.name + i + pathParse.ext);
-		// 	var predictFilePath = path.join(pathParse.dir, "predict" + i + pathParse.ext);
-
-		// 	console.log('python ./data/ML/mlFiles/easy.py ' + trainFilePath + ' ' + predictFilePath);
-
-		// 	shell.exec('python ./data/ML/mlFiles/easy.py ' + trainFilePath + ' ' + predictFilePath, {silent:false,async:false});
-		// };
-
-		shell.cd('./data/ML/mlFiles');
-		// console.log(__dirname);
-		for (var i = 0; i < numOfFolds; i++) {
-			var trainFilePath = pathParse.name + i + pathParse.ext;
-			var predictFilePath = "predict" + i + pathParse.ext;
-
-			shell.exec('python easy.py ' + trainFilePath + ' ' + predictFilePath, {silent:false,async:false});
-		};
-		shell.cd('../../..');
-		var finalResult = this.computeAccuracy(filePath, numOfFolds);
-		console.log(finalResult);
-		return finalResult;
-	},
-
-	computeAccuracy : function (filePath, numOfFolds){
-		var pathParse = path.parse(filePath);
-		var finalAccuracy = 0;
+		var results = {"accuracy" : 0, "confusionMat" : this.zeros(twoDimArray.length, twoDimArray.length)};
 
 		for (var i = 0; i < numOfFolds; i++) {
 			var predictFilePath = path.join(pathParse.dir, "predict" + i + pathParse.ext);
 			var predictResultFilePath = path.join(pathParse.dir, "predict" + i + pathParse.ext + ".predict");
 
-			var predictFileLines = fs.readFileSync(predictFilePath, 'utf8').split('\n');
-			var predictResultFileLines = fs.readFileSync(predictResultFilePath, 'utf8').split('\n');
+			var predictFileLines = this.readFileWithEachLineIntoArray(predictFilePath);
+			var predictResultFileLines = this.readFileWithEachLineIntoArray(predictResultFilePath);
 
-			if (typeof predictFileLines[predictFileLines.length-1][0] === 'undefined') {
-				predictFileLines.splice(predictFileLines.length-1, 1);
-			};
-			if (typeof predictResultFileLines[predictResultFileLines.length-1][0] === 'undefined') {
-				predictResultFileLines.splice(predictResultFileLines.length-1, 1);
-			};
-			// console.log("fold : " + i + "---------------------------");
 			var matchCount = 0;
 			for (var j = 0; j < predictFileLines.length; j++) {
+				var predictLabel = parseInt(predictFileLines[j].split(' ')[0]);
+				var predictResultLabel = parseInt(predictResultFileLines[j]);
+				var predictLabelIdx = this.getIdxByLabelFrom2DArray(predictLabel, twoDimArray);
+				var predictResultIdx = this.getIdxByLabelFrom2DArray(predictResultLabel, twoDimArray);
 
-				// console.log("predictFileLines[j][0] = " + predictFileLines[j].split(' ')[0]);
-				// console.log("predictResultFileLines[j][0] = " + predictResultFileLines[j]);
-				if (parseInt(predictFileLines[j].split(' ')[0]) == parseInt(predictResultFileLines[j])){
+				if (predictLabel == predictResultLabel){
 					matchCount++;
-				}
+				};
 			};
 			// console.log("matchCount " + matchCount);
-			finalAccuracy += matchCount/predictFileLines.length;
+			results.accuracy += matchCount/predictFileLines.length;
 		};
-		finalAccuracy /= numOfFolds;
-		return finalAccuracy;
+		results.accuracy /= numOfFolds;
+		return results;
+	},
+
+	zeros : function (iMax, jMax){
+		var mat = new Array(iMax);
+		for (var i = 0; i < iMax; i++) {
+			mat[i] = new Array(jMax);
+			for (var j = 0; j < jMax; j++) {
+				mat[i][j] = 0;
+			};
+		};
+		return mat;
+	},
+
+	getIdxByLabelFrom2DArray : function (label, twoDimArray){
+		for (var i = 0; i < twoDimArray.length; i++) {
+			if(parseInt(twoDimArray[i][0].split(' ')[0]) == label){
+				return i;
+			};
+		};
 	}
 }
 
 // trainMgr.createFoldsValidationFiles("./data/ML/mlFiles/train.ml", 4);
-// trainMgr.crossValidation("./data/ML/mlFiles/train.ml", 4);
+// trainMgr.crossValidation("./data/ML/mlFiles/train.ml", 10);
 
 module.exports = trainMgr;
