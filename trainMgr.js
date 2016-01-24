@@ -242,16 +242,20 @@ var trainMgr = {
 			var foldData = this.getTrainAndPredictFoldData(i, numOfFolds, twoDimArray);
 			// console.log(foldData);
 
-			var trainWriteFile = fs.createWriteStream(trainFilePath);
-			var predictWriteFile = fs.createWriteStream(predictFilePath);
-			trainWriteFile.on('error', function(err){});
-			predictWriteFile.on('error', function(err){});
+			// var trainWriteFile = fs.createWriteStream(trainFilePath);
+			// var predictWriteFile = fs.createWriteStream(predictFilePath);
+			// trainWriteFile.on('error', function(err){});
+			// predictWriteFile.on('error', function(err){});
 
-			foldData.train.forEach(function(v){trainWriteFile.write(v + '\n');});
-			foldData.predict.forEach(function(v){predictWriteFile.write(v + '\n');});
+			// foldData.train.forEach(function(v){trainWriteFile.write(v + '\n');});
+			// foldData.predict.forEach(function(v){predictWriteFile.write(v + '\n');});
 
-			trainWriteFile.end();
-			predictWriteFile.end();
+			// trainWriteFile.end();
+			// predictWriteFile.end();
+			if (fs.existsSync(trainFilePath)) {shell.rm(trainFilePath)};
+			if (fs.existsSync(predictFilePath)) {shell.rm(predictFilePath)};
+			foldData.train.forEach(function(v){fs.appendFileSync(trainFilePath, v + '\n')});
+			foldData.predict.forEach(function(v){fs.appendFileSync(predictFilePath, v + '\n')});
 		};
 	},
 
@@ -292,6 +296,63 @@ var trainMgr = {
 		};
 
 		return foldData;
+	},
+
+	crossValidation : function (filePath, numOfFolds){
+		this.createFoldsValidationFiles(filePath, numOfFolds);
+
+		var pathParse = path.parse(filePath);
+		// for (var i = 0; i < numOfFolds; i++) {
+		// 	var trainFilePath = path.join(pathParse.dir, pathParse.name + i + pathParse.ext);
+		// 	var predictFilePath = path.join(pathParse.dir, "predict" + i + pathParse.ext);
+
+		// 	console.log('python ./data/ML/mlFiles/easy.py ' + trainFilePath + ' ' + predictFilePath);
+
+		// 	shell.exec('python ./data/ML/mlFiles/easy.py ' + trainFilePath + ' ' + predictFilePath, {silent:false,async:false});
+		// };
+
+		shell.cd('./data/ML/mlFiles');
+		// console.log(__dirname);
+		for (var i = 0; i < numOfFolds; i++) {
+			var trainFilePath = pathParse.name + i + pathParse.ext;
+			var predictFilePath = "predict" + i + pathParse.ext;
+
+			shell.exec('python easy.py ' + trainFilePath + ' ' + predictFilePath, {silent:false,async:false});
+		};
+		shell.cd('../../..');
+		var finalResult = this.computeAccuracy(filePath, numOfFolds);
+		console.log(finalResult);
+		return finalResult;
+	},
+
+	computeAccuracy : function (filePath, numOfFolds){
+		var pathParse = path.parse(filePath);
+		var finalAccuracy = 0;
+
+		for (var i = 0; i < numOfFolds; i++) {
+			var predictFilePath = path.join(pathParse.dir, "predict" + i + pathParse.ext);
+			var predictResultFilePath = path.join(pathParse.dir, "predict" + i + pathParse.ext + ".predict");
+
+			var predictFileLines = fs.readFileSync(predictFilePath, 'utf8').split('\n');
+			var predictResultFileLines = fs.readFileSync(predictResultFilePath, 'utf8').split('\n');
+
+			if (typeof predictFileLines[predictFileLines.length-1][0] === 'undefined') {
+				predictFileLines.splice(predictFileLines.length-1, 1);
+			};
+			if (typeof predictResultFileLines[predictResultFileLines.length-1][0] === 'undefined') {
+				predictResultFileLines.splice(predictResultFileLines.length-1, 1);
+			};
+
+			var matchCount = 0;
+			for (var j = 0; j < predictFileLines.length; j++) {
+				if (predictFileLines[j][0] == predictResultFileLines[j][0]){
+					matchCount++;
+				}
+			};
+			finalAccuracy += matchCount/predictFileLines.length;
+		};
+		finalAccuracy /= numOfFolds;
+		return finalAccuracy;
 	}
 }
 
