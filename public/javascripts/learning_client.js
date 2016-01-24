@@ -131,45 +131,45 @@ var chart = c3.generate({
     }
 });
 
-// window.setInterval(function(){
+window.setInterval(function(){
 
-//   $.ajax({
-//       url: 'http://127.0.0.1:3000/SGValues',
-//       dataType: "jsonp",
-//       jsonpCallback: "_SGValues",
-//       cache: false,
-//       timeout: 5000,
-//       success: function(data) {
-//         // console.log(data)
-//         obj = JSON.parse(data);
-//         var values = obj.values.split(",");
+  $.ajax({
+      url: 'http://127.0.0.1:3000/SGValues',
+      dataType: "jsonp",
+      jsonpCallback: "_SGValues",
+      cache: false,
+      timeout: 5000,
+      success: function(data) {
+        // console.log(data)
+        obj = JSON.parse(data);
+        var values = obj.values.split(",");
 
-//         // console.log((['SG1']).concat(SG_values[0]));
+        // console.log((['SG1']).concat(SG_values[0]));
         
-//         for (var i = 0; i < values.length; i++) {
-//          SG_values[i].push(values[i]);
-//          SG_values[i].shift();
+        for (var i = 0; i < values.length; i++) {
+         SG_values[i].push(values[i]);
+         SG_values[i].shift();
 
-//          SG_values[i].unshift('SG' + String(i+1));
-//          SG_values[i].shift();
+         SG_values[i].unshift('SG' + String(i+1));
+         SG_values[i].shift();
 
-//         };
+        };
 
-//         chart.load({
-//         columns: [
-//           ['SG1', SG_values[0][9]-512],
-//             ['SG2', SG_values[1][9]-512],
-//             ['SG3', SG_values[2][9]-512],
-//             ['SG4', SG_values[3][9]-512],
-//             ['SG5', SG_values[4][9]-512],
-//             ['SG6', SG_values[5][9]-512],
-//             ['SG7', SG_values[6][9]-512],
-//             ['SG8', SG_values[7][9]-512],
-//             ['SG9', SG_values[8][9]-512]
-//         ]
-//       });
-//       },
-//       error: function(jqXHR, textStatus, errorThrown) {
-//       }
-//   });
-// }, 100);
+        chart.load({
+        columns: [
+          ['SG1', SG_values[0][9]-512],
+            ['SG2', SG_values[1][9]-512],
+            ['SG3', SG_values[2][9]-512],
+            ['SG4', SG_values[3][9]-512],
+            ['SG5', SG_values[4][9]-512],
+            ['SG6', SG_values[5][9]-512],
+            ['SG7', SG_values[6][9]-512],
+            ['SG8', SG_values[7][9]-512],
+            ['SG9', SG_values[8][9]-512]
+        ]
+      });
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+      }
+  });
+}, 100);

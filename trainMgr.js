@@ -26,8 +26,8 @@ var trainMgr = {
 
 
 
-		// var processedData = this.processDataByTime(3);
-		// this.trainSVM(processedData);
+		var processedData = this.processDataByTime(3);
+		this.trainSVM(processedData);
 
 		this.crossValidation('./data/ML/mlFiles/train.ml',10);
 	},
