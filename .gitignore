@@ -8,3 +8,5 @@
 *.out
 *.predict
 *.scale
+
+!/data/dataWithMatrix_keep/*
