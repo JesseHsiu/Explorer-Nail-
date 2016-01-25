@@ -8,5 +8,6 @@
 *.out
 *.predict
 *.scale
+*.png
 
 !/data/dataWithMatrix_keep/*

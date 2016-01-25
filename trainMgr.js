@@ -234,14 +234,14 @@ var trainMgr = {
 
 		var pathParse = path.parse(filePath);
 
-		// shell.cd('./data/ML/mlFiles');
-		// for (var i = 0; i < numOfFolds; i++) {
-		// 	var trainFilePath = pathParse.name + i + pathParse.ext;
-		// 	var predictFilePath = "predict" + i + pathParse.ext;
+		shell.cd('./data/ML/mlFiles');
+		for (var i = 0; i < numOfFolds; i++) {
+			var trainFilePath = pathParse.name + i + pathParse.ext;
+			var predictFilePath = "predict" + i + pathParse.ext;
 
-		// 	shell.exec('python easy.py ' + trainFilePath + ' ' + predictFilePath, {silent:false,async:false});
-		// };
-		// shell.cd('../../..');
+			shell.exec('python easy.py ' + trainFilePath + ' ' + predictFilePath, {silent:false,async:false});
+		};
+		shell.cd('../../..');
 
 		var finalResult = this.computeResults(filePath, numOfFolds, twoDimArray);
 		console.log("finalResult.accuracy = " + finalResult.accuracy);
