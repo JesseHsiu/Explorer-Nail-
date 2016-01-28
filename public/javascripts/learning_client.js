@@ -11,6 +11,7 @@ var numOfGestures = 14;
 var numOfRounds = 10;
 
 var nameOfGestures=[
+  '',
   'Tap',
   'Force Tap',
   'Swipe Left',
@@ -44,16 +45,25 @@ function checkKey(e) {
       recordBtnClick();
     }
 }
-var task = [];
+// var task = [];
 
-for (var i = 0; i < numOfGestures; i++) {
-  task.push(i);
-};
-task = shuffle(task);
 
-$("#nameOfGesture").text('Task: ' + nameOfGestures[task[currentType]]);
-$("#Type").text("Current Type: " + task[currentType].toString());
-$("#Round").text("Current Rount: "+ currentRound.toString());
+var task = new Array(numOfRounds);
+for (var i = 0; i < numOfRounds; i++) {
+  task[i] = [];
+  
+  for (var j = 1; j <= numOfGestures; j++) {
+    task[i].push(j);
+  };
+  task[i] = shuffle(task[i]);
+}
+
+// for (var i = 1; i <= numOfGestures; i++) {
+//   task.push(i);
+// };
+// task = shuffle(task);
+
+updateText();
 $("#doneNotification").hide();
 function recordBtnClick () {
 
@@ -61,7 +71,7 @@ function recordBtnClick () {
 	if (state == record_state.IDLE)
 	{
 		$.ajax({
-            url: 'http://127.0.0.1:3000/training/start/'+ task[currentType].toString(),
+            url: 'http://127.0.0.1:3000/training/start/'+ task[currentRound-1][currentType-1].toString(),
             cache: false,
             timeout: 5000
         });
@@ -80,16 +90,14 @@ function recordBtnClick () {
         {
           $("#doneNotification").show();
         };
-        task = shuffle(task);
         currentRound++;
         currentType = 1;
       }
       else{
         currentType++;
       }
-      $("#nameOfGesture").text('Task: ' + nameOfGestures[task[currentType]]);
-      $("#Type").text("Current Type: " + task[currentType].toString());
-      $("#Round").text("Current Rount: "+ currentRound.toString());
+      console.log(currentType);
+      updateText();
       
 
       });
@@ -97,6 +105,13 @@ function recordBtnClick () {
 
       
 	}
+}
+
+function updateText()
+{
+  $("#nameOfGesture").text('Task: ' + nameOfGestures[task[currentRound-1][currentType-1]]);
+  $("#Type").text("Current Type: " + task[currentRound-1][currentType-1].toString());
+  $("#Round").text("Current Rount: "+ currentRound.toString());
 }
 function cleanBtnClick () {
 	$.ajax({
@@ -116,6 +131,16 @@ function deleteLastOne(){
     timeout: 5000
   });
   state = record_state.IDLE;
+  if (currentType == 1)
+  {
+    currentType = numOfGestures;
+    currentRound --;
+  }
+  else{
+    currentType --;
+  }
+
+  updateText();
 }
 
 
