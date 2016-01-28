@@ -25,12 +25,12 @@ var trainMgr = {
 		// this.equalLength();
 		
 
-
+		this.clearModel();
 
 		var processedData = this.processDataByTime(3);
 		this.trainSVM(processedData);
 
-		this.crossValidation('./data/ML/mlFiles/train.ml',10);
+		this.crossValidation('./data/ML/mlFiles/train.ml',10, []);
 	},
 	clearModel: function(){
 		shell.rm('./data/ML/mlFiles/train.csv');
@@ -228,8 +228,8 @@ var trainMgr = {
 		
 	},
 
-	crossValidation : function (filePath, numOfFolds){
-		var twoDimArray = this.createOrganized2DArrayDataFromFile(filePath);
+	crossValidation : function (filePath, numOfFolds, ignoreLabels){
+		var twoDimArray = this.createOrganized2DArrayDataFromFile(filePath, ignoreLabels);
 		this.createFoldsValidationFiles(filePath, numOfFolds, twoDimArray);
 
 		var pathParse = path.parse(filePath);
@@ -258,13 +258,13 @@ var trainMgr = {
 		return lines;
 	},
 
-	createOrganized2DArrayDataFromFile : function(filePath){
+	createOrganized2DArrayDataFromFile : function(filePath, ignoreLabels){
 		var lines = this.readFileWithEachLineIntoArray(filePath);
 
-		return this.get2DArrayDataFromDataLines(lines);
+		return this.get2DArrayDataFromDataLines(lines, ignoreLabels);
 	},
 
-	get2DArrayDataFromDataLines : function(lines){
+	get2DArrayDataFromDataLines : function(lines, ignoreLabels){
 		var twoDimArray = [];
 		var sortedLines = stable(lines, function(a, b){return parseInt(a.split(' ')[0]) > parseInt(b.split(' ')[0]);});
 
@@ -272,16 +272,25 @@ var trainMgr = {
 		var numOfElemOfLabel = 0;
 		var i = 0;
 		for (; i < sortedLines.length; i++) {
-			if (parseInt(sortedLines[i].split(' ')[0]) != currentLineLabel) {
-				currentLineLabel = parseInt(sortedLines[i].split(' ')[0]);
-				twoDimArray.push(sortedLines.slice(i - numOfElemOfLabel, i));
+			var lineLabel = parseInt(sortedLines[i].split(' ')[0]);
+
+			if (lineLabel != currentLineLabel) {
+				if (numOfElemOfLabel > 0) {
+					twoDimArray.push(sortedLines.slice(i - numOfElemOfLabel, i));
+				};
+				currentLineLabel = lineLabel;
 				numOfElemOfLabel = 0;
 			};
+
+			if (ignoreLabels.indexOf(lineLabel) > -1) {
+				continue;
+			};
+
 			numOfElemOfLabel++;
 		};
 
 		twoDimArray.push(sortedLines.slice(i - numOfElemOfLabel, i));
-		// console.log(twoDimArray);
+		console.log(twoDimArray);
 		return twoDimArray;
 	},
 
@@ -414,6 +423,6 @@ var trainMgr = {
 }
 
 // trainMgr.createFoldsValidationFiles("./data/ML/mlFiles/train.ml", 4);
-// trainMgr.crossValidation("./data/ML/mlFiles/train.ml", 10);
+// trainMgr.crossValidation("./data/ML/mlFiles/train.ml", 10, [1, 5, 2]);
 
 module.exports = trainMgr;
