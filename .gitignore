@@ -11,3 +11,4 @@
 *.png
 
 !/data/dataWithMatrix_keep/*
+!/data/new_force_study/*

@@ -10,23 +10,84 @@ var currentRound = 1;
 var numOfGestures = 14;
 var numOfRounds = 10;
 
+var animationCSSName = ["animation-tap","animation-rightLeft","animation-leftRight","animation-bottomUp","animation-upBottom","animation-shearLeft", "animation-shearRight", "animation-shearUp", "animation-shearDown"];
+
 var nameOfGestures=[
   '',
   'Tap',
   'Force Tap',
   'Swipe Left',
-  'Force Swipe Left',
+  'Swipe Force Left',
   'Swipe Right',
-  'Force Swipe Right',
+  'Swipe Force Right',
   'Swipe Up',
-  'Force Swipe Up',
+  'Swipe Force Up',
   'Swipe Down',
-  'Force Swipe Down',
-  'Shear Force Left',
-  'Shear Force Right',
-  'Shear Force Down',
-  'Shear Force Up',
+  'Swipe Force Down',
+  'Shear Left',
+  'Shear Right',
+  'Shear Up',
+  'Shear Down'
 ];
+
+
+function changeAnimation (index) {
+  var animationType;
+  var force = false;
+
+  //tap
+  if (index == 1 || index == 2)
+  {
+    animationType = 0;
+  }
+  //left
+  else if(index == 3 || index == 4){
+    animationType = 1;
+  }
+  //right
+  else if(index == 5 || index == 6){
+    animationType = 2;
+  }
+  //up
+  else if(index == 7 || index == 8){
+    animationType = 3;
+  }
+  //down
+  else if(index == 9 || index == 10){
+    animationType = 4;
+  }
+  else if(index == 11)
+  {
+    animationType = 5;
+  }
+  else if(index == 12)
+  {
+    animationType = 6; 
+  }
+  else if(index == 13)
+  {
+    animationType = 7;
+  }
+  else if(index == 14)
+  {
+    animationType = 8;
+  }
+
+
+
+  if (index == 2 || index == 4 || index == 6 || index == 8 || index == 10 || index == 11 || index == 12 || index == 13 || index == 14)
+  {
+    $("#instructionAnimation").css("background-color", "red");  
+  }
+  else{
+    $("#instructionAnimation").css("background-color", "green");   
+  }
+  
+  $("#instructionAnimation").removeClass();
+  $("#instructionAnimation").addClass(animationCSSName[animationType]);
+}
+
+
 
 
 window.addEventListener("keydown", function(e) {
@@ -64,6 +125,10 @@ for (var i = 0; i < numOfRounds; i++) {
 // task = shuffle(task);
 
 updateText();
+
+changeAnimation(task[currentRound-1][currentType-1]);
+
+
 $("#doneNotification").hide();
 function recordBtnClick () {
 
@@ -98,6 +163,7 @@ function recordBtnClick () {
       }
       console.log(currentType);
       updateText();
+      changeAnimation(task[currentRound-1][currentType-1]);
       
 
       });
@@ -109,6 +175,7 @@ function recordBtnClick () {
 
 function updateText()
 {
+  changeAnimation(task[currentRound-1][currentType-1]);
   $("#nameOfGesture").text('Task: ' + nameOfGestures[task[currentRound-1][currentType-1]]);
   $("#Type").text("Current Type: " + task[currentRound-1][currentType-1].toString());
   $("#Round").text("Current Rount: "+ currentRound.toString());
