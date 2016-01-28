@@ -40,6 +40,12 @@ router.get('/end', function(req, res, next) {
   saveMgr.endOfWriting();
 });
 
+router.get('/deleteLastOne', function(req, res, next) {
+  saveMgr.deleteLastOne();
+  res.writeHead(200, {'Content-Type': 'text/plain'});
+  res.end();
+});
+
 router.get('/cleardata', function(req, res, next) {
   state = stateMachine.IDLE;
 

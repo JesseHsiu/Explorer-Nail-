@@ -7,18 +7,61 @@ var state = record_state.IDLE;
 var currentType = 1;
 var currentRound = 1;
 // Config this.
-var numOfGestures = 16;
+var numOfGestures = 14;
 var numOfRounds = 10;
 
-$("#Type").text("Current Type: " + currentType.toString());
+var nameOfGestures=[
+  'Tap',
+  'Force Tap',
+  'Swipe Left',
+  'Force Swipe Left',
+  'Swipe Right',
+  'Force Swipe Right',
+  'Swipe Up',
+  'Force Swipe Up',
+  'Swipe Down',
+  'Force Swipe Down',
+  'Shear Force Left',
+  'Shear Force Right',
+  'Shear Force Down',
+  'Shear Force Up',
+];
+
+
+window.addEventListener("keydown", function(e) {
+    // space and arrow keys
+    if([32].indexOf(e.keyCode) > -1) {
+        e.preventDefault();
+    }
+}, false);
+document.onkeydown = checkKey;
+
+function checkKey(e) {
+
+    e = e || window.event;
+
+    if (e.keyCode == '32') {
+      recordBtnClick();
+    }
+}
+var task = [];
+
+for (var i = 0; i < numOfGestures; i++) {
+  task.push(i);
+};
+task = shuffle(task);
+
+$("#nameOfGesture").text('Task: ' + nameOfGestures[task[currentType]]);
+$("#Type").text("Current Type: " + task[currentType].toString());
 $("#Round").text("Current Rount: "+ currentRound.toString());
 $("#doneNotification").hide();
 function recordBtnClick () {
+
 	console.log("BtnClick")
 	if (state == record_state.IDLE)
 	{
 		$.ajax({
-            url: 'http://127.0.0.1:3000/training/start/'+ currentType.toString(),
+            url: 'http://127.0.0.1:3000/training/start/'+ task[currentType].toString(),
             cache: false,
             timeout: 5000
         });
@@ -37,14 +80,15 @@ function recordBtnClick () {
         {
           $("#doneNotification").show();
         };
+        task = shuffle(task);
         currentRound++;
         currentType = 1;
       }
       else{
         currentType++;
       }
-
-      $("#Type").text("Current Type: " + currentType.toString());
+      $("#nameOfGesture").text('Task: ' + nameOfGestures[task[currentType]]);
+      $("#Type").text("Current Type: " + task[currentType].toString());
       $("#Round").text("Current Rount: "+ currentRound.toString());
       
 
@@ -63,6 +107,15 @@ function cleanBtnClick () {
     state = record_state.IDLE;
 	$("#recordBtn").removeClass("btn-danger");
 	$("#recordBtn").text("Start Record");
+}
+
+function deleteLastOne(){
+  $.ajax({
+    url: 'http://127.0.0.1:3000/training/deleteLastOne',
+    cache: false,
+    timeout: 5000
+  });
+  state = record_state.IDLE;
 }
 
 
@@ -173,3 +226,9 @@ window.setInterval(function(){
       }
   });
 }, 100);
+
+
+function shuffle(o){
+    for(var j, x, i = o.length; i; j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
+    return o;
+}

@@ -18,6 +18,13 @@ var saveMgr = {
 		// this.csvStream = csv.createWriteStream({'headers': needHeader, 'flags': 'a'});
 		// this.csvStream.pipe(this.writableStream);
 	},
+	deleteLastOne: function (){
+		var configFile = fs.readFileSync(this.filePath);
+		var config = JSON.parse(configFile);
+		config.pop();
+		var configJSON = JSON.stringify(config);
+		fs.writeFileSync(this.filePath, configJSON);
+	},
 	writeData: function (data) {
 		needToStoreData = data.split(" ");
 
