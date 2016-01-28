@@ -30,7 +30,7 @@ var trainMgr = {
 		var processedData = this.processDataByTime(3);
 		this.trainSVM(processedData);
 
-		this.crossValidation('./data/ML/mlFiles/train.ml',10, []);
+		this.crossValidation('./data/ML/mlFiles/train.ml',10, [11,12,13,14]);
 	},
 	clearModel: function(){
 		shell.rm('./data/ML/mlFiles/train.csv');
