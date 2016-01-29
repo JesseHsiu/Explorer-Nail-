@@ -12,3 +12,5 @@
 
 !/data/dataWithMatrix_keep/*
 !/data/new_force_study/*
+!/data/new_force_study/1zone/*
+!/data/new_force_study/3zone/*

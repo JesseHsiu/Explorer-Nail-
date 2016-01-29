@@ -75,9 +75,13 @@ function changeAnimation (index) {
 
 
 
-  if (index == 2 || index == 4 || index == 6 || index == 8 || index == 10 || index == 11 || index == 12 || index == 13 || index == 14)
+  if (index == 2 || index == 4 || index == 6 || index == 8 || index == 10)
   {
     $("#instructionAnimation").css("background-color", "red");  
+  }
+  else if(index == 11 || index == 12 || index == 13 || index == 14)
+  {
+    $("#instructionAnimation").css("background-color", "orange");   
   }
   else{
     $("#instructionAnimation").css("background-color", "green");   
