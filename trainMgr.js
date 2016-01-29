@@ -27,8 +27,8 @@ var trainMgr = {
 
 		this.clearModel();
 
-		var processedData = this.processDataByTime(3);
-		this.trainSVM(processedData);
+		var processedData = this.processDataByTime(1);
+		this.trainSVM(processedData, 1);
 
 		this.crossValidation('./data/ML/mlFiles/train.ml',10, [11,12,13,14]);
 	},
@@ -132,7 +132,7 @@ var trainMgr = {
 		
 		// this.trainOneByOne(trainingSet, 0);
 	},
-	trainSVM: function(trainingSet)
+	trainSVM: function(trainingSet, group)
 	{
 		for (var i = 0; i < trainingSet.length; i++) {
 			
@@ -149,7 +149,7 @@ var trainMgr = {
 		shell.cd('data');
 		shell.cd('ML');
 		shell.cd('mlFiles');
-		shell.exec('python csv2libsvm.py train.csv', {silent:true,async:false});
+		shell.exec('python csv2libsvm.py train.csv '+ group, {silent:true,async:false});
 		shell.cd('..')
 		shell.cd('..')
 		shell.cd('..')

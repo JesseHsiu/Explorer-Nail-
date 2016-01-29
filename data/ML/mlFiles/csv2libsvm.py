@@ -23,9 +23,9 @@ def construct_line( label, line ):
 	new_line += "\n"
 	return new_line
 
-def csv2libsvm(input_file, output_file):
+def csv2libsvm(input_file, output_file, groups):
 
-	label_index = 18*3
+	label_index = 18 * int(groups)
 	skip_headers = False
 
 	i = open( input_file, 'rb' )
@@ -46,7 +46,8 @@ def csv2libsvm(input_file, output_file):
 		o.write( new_line )
 
 nameOfFile = sys.argv[1]
+groups = sys.argv[2]
 name = nameOfFile.split('.')[0]
 
-csv2libsvm(nameOfFile, name + '.ml')
+csv2libsvm(nameOfFile, name + '.ml', groups)
 
