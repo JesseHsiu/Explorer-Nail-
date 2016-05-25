@@ -30,67 +30,67 @@ var collect_datalength = 50;
 var recount = 0;
 var idleCount = 9;
 var stdText = "";
-socket.on('SGdata', function (data) {
-  // console.log(state);
-  var sgValues = data['data'];
-  $('#value').text(sgValues);
-  stdText = "";
-  // var startDetect = false;
-  // var endDetect = false;
-  idleCount = 0;
-  for (var i = 0; i < sgValues.length; i++) {
-    SG_values[i].push(sgValues[i]);
-    var stdValue = standardDeviation(SG_values[i]);
-    stdText += Math.floor(stdValue).toString() + ",";
-    if (SG_values[i].length > collect_datalength) {
-      SG_values[i].shift();
-      if (state == stateMachine.START)
-      {
+// socket.on('SGdata', function (data) {
+//   // console.log(state);
+//   var sgValues = data['data'];
+//   $('#value').text(sgValues);
+//   stdText = "";
+//   // var startDetect = false;
+//   // var endDetect = false;
+//   idleCount = 0;
+//   for (var i = 0; i < sgValues.length; i++) {
+//     SG_values[i].push(sgValues[i]);
+//     var stdValue = standardDeviation(SG_values[i]);
+//     stdText += Math.floor(stdValue).toString() + ",";
+//     if (SG_values[i].length > collect_datalength) {
+//       SG_values[i].shift();
+//       if (state == stateMachine.START)
+//       {
         
-        // console.log(i);
-        // console.log(stdValue);
-        if (stdValue < 100)
-        {
-          idleCount += 1;
-        }
-      }
-      else{
-        idleCount += 1;
-      }
-    };
-  };
+//         // console.log(i);
+//         // console.log(stdValue);
+//         if (stdValue < 100)
+//         {
+//           idleCount += 1;
+//         }
+//       }
+//       else{
+//         idleCount += 1;
+//       }
+//     };
+//   };
   
-  // console.log(idleCount);
-  // console.log(state);
-  if (idleCount == 9 && SG_values[0].length == collect_datalength)
-  {
-    state = stateMachine.END;
-  }
-  else{
-    console.log(new Date() - endtime);
-  }
-  // else{
-  //   state = stateMachine.START;
-  // }
-  // console.log(state);
+//   // console.log(idleCount);
+//   // console.log(state);
+//   if (idleCount == 9 && SG_values[0].length == collect_datalength)
+//   {
+//     state = stateMachine.END;
+//   }
+//   else{
+//     console.log(new Date() - endtime);
+//   }
+//   // else{
+//   //   state = stateMachine.START;
+//   // }
+//   // console.log(state);
 
-  // if (startDetect) {state = stateMachine.START;}
-  // else if(endDetect){state = stateMachine.IDLE;};
+//   // if (startDetect) {state = stateMachine.START;}
+//   // else if(endDetect){state = stateMachine.IDLE;};
 
-  $('#stdText').text(stdText);
-  if (state == stateMachine.IDLE) {
-    $('#state').text('Current State: Idle');
-  }
-  else if(state == stateMachine.START)
-  {
-    $('#state').text('Current State: Start');
-  }
-  else if(state == stateMachine.END)
-  {
-    $('#state').text('Current State: End');
-  }
+//   $('#stdText').text(stdText);
+//   if (state == stateMachine.IDLE) {
+//     $('#state').text('Current State: Idle');
+//   }
+//   else if(state == stateMachine.START)
+//   {
+//     $('#state').text('Current State: Start');
+//   }
+//   else if(state == stateMachine.END)
+//   {
+//     $('#state').text('Current State: End');
+//   }
 
-});
+// });
 
 window.addEventListener("keydown", function(e) {
     // space and arrow keys
