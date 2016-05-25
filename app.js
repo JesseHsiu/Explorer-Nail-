@@ -23,9 +23,13 @@ var globalsocket = null;
 server.listen(3000);
 
 io.on('connection', function (socket) {
-  socket.emit('identification',{});
-  socket.on('identification', function (data) {
-    if (data['device']== 'desktop') {globalsocket = socket};
+  // console.log("new users");
+  globalsocket = socket;
+  // socket.emit('identification',{});
+  socket.on('gesture', function (data) {
+    console.log(data);
+    socket.broadcast.emit('gesture', { gestureID: data });
+    // socket.to('others').emit('gesture', { gestureID: data });
   });
 
 });
@@ -47,7 +51,7 @@ var SerialPort = serialport.SerialPort; // localize object constructor
 //   });
 // });
 
-
+// 14CP0109
 app.locals.sp = new SerialPort("/dev/cu.usbserial-AI02SSRK", {
   parser: serialport.parsers.readline("\n"),
   baudrate: 38400
@@ -66,6 +70,9 @@ var handlerForNewData = function(datas) {
     for (var i = 1; i <= 9; i++) {
       app.locals.SGs.currentValue[i-1] = parseInt(storeDataToArray[i]);
     };
+    app.locals.SGs.currentValue[0] = parseInt((app.locals.SGs.currentValue[3] + app.locals.SGs.currentValue[4])/2);
+    // app.locals.SGs.currentValue[1] = parseInt((app.locals.SGs.currentValue[2] + app.locals.SGs.currentValue[3] + app.locals.SGs.currentValue[4] + app.locals.SGs.currentValue[5])/4);
+    // app.locals.SGs.currentValue[7] = parseInt((app.locals.SGs.currentValue[3] + app.locals.SGs.currentValue[4] + app.locals.SGs.currentValue[5] + app.locals.SGs.currentValue[6] + app.locals.SGs.currentValue[8])/5);
   };
   if (globalsocket !=null) {
     globalsocket.broadcast.emit('SGdata', { data: app.locals.SGs.currentValue});
